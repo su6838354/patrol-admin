@@ -39,3 +39,12 @@ export function updateArticle(data) {
     data
   })
 }
+
+export function fetchCboOrder(query) {
+  return request({
+    url: 'http://139.196.243.147:3001/cbo/list_search',
+    // url: 'http://127.0.0.1:3002/cbo/list_search',
+    method: 'post',
+    data: query
+  })
+}
