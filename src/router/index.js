@@ -29,17 +29,17 @@ export const constantRouterMap = [
   { path: '/authredirect', component: () => import('@/views/login/authredirect'), hidden: true },
   { path: '/404', component: () => import('@/views/errorPage/404'), hidden: true },
   { path: '/401', component: () => import('@/views/errorPage/401'), hidden: true },
-  {
-    path: '',
-    component: Layout,
-    redirect: 'dashboard',
-    children: [{
-      path: 'dashboard',
-      component: () => import('@/views/dashboard/index'),
-      name: 'dashboard',
-      meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
-    }]
-  },
+  //  {
+  //    path: '',
+  //    component: Layout,
+  //    redirect: 'dashboard',
+  //    children: [{
+  //      path: 'dashboard',
+  //      component: () => import('@/views/dashboard/index'),
+  //      name: 'dashboard',
+  //      meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
+  //    }]
+  //  },
   {
     path: '/cbo_order',
     component: Layout,
