@@ -13,28 +13,41 @@
 
 
     <div class="filter-container">
-      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" :placeholder="'日期'" v-model="query.order_date">
-      </el-input>
+      <el-date-picker  @keyup.enter.native="fetchData" style="width: 200px;" class="filter-item" v-model="query.order_date" value-format="yyyy-MM-dd" format="yyyy-MM-dd" type="date" :placeholder="'日期'"></el-date-picker>
 
-      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" :placeholder="'线路'" v-model="query.order_path">
-      </el-input>
+      <!--<el-input @keyup.enter.native="fetchData" style="width: 200px;" class="filter-item" :placeholder="'日期'" v-model="query.order_date">-->
+      <!--</el-input>-->
 
-
-      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" :placeholder="'站点'" v-model="query.order_station">
-      </el-input>
+      <!--<el-input @keyup.enter.native="fetchData" style="width: 200px;" class="filter-item" :placeholder="'线路'" v-model="query.order_path">-->
+      <!--</el-input>-->
 
 
-      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" :placeholder="'班次'" v-model="query.order_class">
-      </el-input>
+      <!--<el-input @keyup.enter.native="fetchData" style="width: 200px;" class="filter-item" :placeholder="'站点'" v-model="query.order_station">-->
+      <!--</el-input>-->
+
+
+      <!--<el-input @keyup.enter.native="fetchData" style="width: 200px;" class="filter-item" :placeholder="'班次'" v-model="query.order_class">-->
+      <!--</el-input>-->
 
 
       <!--<el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" :placeholder="'日期'" v-model="query.order_date">-->
       <!--</el-input>-->
 
-      <!--<el-select clearable style="width: 90px" class="filter-item" v-model="listQuery.importance" :placeholder="$t('table.importance')">-->
-        <!--<el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item">-->
-        <!--</el-option>-->
-      <!--</el-select>-->
+      <el-select clearable style="width: 200px" class="filter-item" v-model="query.order_path" :placeholder="'线路'">
+        <el-option v-for="item in getPath" :key="item" :label="item" :value="item">
+        </el-option>
+      </el-select>
+
+      <el-select clearable style="width: 200px" class="filter-item" v-model="query.order_station" :placeholder="'站点'">
+        <el-option v-for="item in getStation" :key="item" :label="item" :value="item">
+        </el-option>
+      </el-select>
+
+      <el-select clearable style="width: 200px" class="filter-item" v-model="query.order_class" :placeholder="'班次'">
+        <el-option v-for="item in getClass" :key="item" :label="item" :value="item">
+        </el-option>
+      </el-select>
+
       <!--<el-select clearable class="filter-item" style="width: 130px" v-model="listQuery.type" :placeholder="$t('table.type')">-->
         <!--<el-option v-for="item in  calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key">-->
         <!--</el-option>-->
@@ -132,11 +145,98 @@ export default {
         order_path: '',
         order_station: '',
         order_class: ''
-      }
+      },
+      orderData: [
+        {
+          name: '旅游1线',
+          stations: [
+            {
+              name: '南门水陆换乘中心',
+              classes: [
+                {
+                  time: '9:00'
+                },
+                {
+                  time: '13:20'
+                }
+              ]
+            },
+            {
+              name: '前卫村',
+              classes: [
+                {
+                  time: '11:00'
+                },
+                {
+                  time: '15:40'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: '旅游2线',
+          stations: [
+            {
+              name: '南门水陆换乘中心',
+              classes: [
+                {
+                  id: 'path_2,point_nanmen,9:00', // 代码按规则自动生成
+                  time: '9:00'
+                },
+                {
+                  time: '13:20'
+                }
+              ]
+            },
+            {
+              name: '明珠湖公园',
+              classes: [
+                {
+                  time: '11:00'
+                },
+                {
+                  time: '15:40'
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   },
   created() {
     this.fetchData()
+  },
+  computed: {
+    getPath() {
+      return this.orderData.map(item => item.name)
+    },
+    getStation() {
+      const selectPath = this.orderData.filter(path => path.name === this.query.order_path)
+      if (selectPath && selectPath.length > 0) {
+        return selectPath[0].stations.map(station => {
+          return station.name
+        })
+      }
+      return []
+    },
+    getClass() {
+      const selectPath = this.orderData.filter(path => path.name === this.query.order_path)
+      if (selectPath && selectPath.length > 0) {
+        const stations = selectPath[0].stations
+        // console.log(selectPath, '1112')
+        // console.log(stations, '111')
+        const selectStations = stations.filter(station => station.name === this.query.order_station)
+        if (selectStations && selectStations.length > 0) {
+          const classes = selectStations[0].classes
+          return classes.map(cls => {
+            return cls.time
+          })
+        }
+      }
+      return []
+    }
   },
   methods: {
     fetchData() {
