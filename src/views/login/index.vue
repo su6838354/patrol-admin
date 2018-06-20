@@ -98,7 +98,7 @@ export default {
           this.loading = true
           this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
             this.loading = false
-            this.$router.push({ path: '/' })
+            this.$router.push({ path: '/cbo_order/index' })
           }).catch(() => {
             this.loading = false
           })

@@ -62,7 +62,7 @@
       <!--<el-checkbox class="filter-item" style='margin-left:15px;' @change='tableKey=tableKey+1' v-model="showReviewer">{{$t('table.reviewer')}}</el-checkbox>-->
     </div>
 
-    <el-table :data="list" v-loading.body="listLoading" element-loading-text="拼命加载中" border fit highlight-current-row>
+    <el-table :data="getList" v-loading.body="listLoading" element-loading-text="拼命加载中" border fit highlight-current-row>
       <el-table-column align="center" label='Id' width="95">
         <template slot-scope="scope">
           {{scope.$index}}
@@ -124,6 +124,15 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-sizes="[10, 20, 50, 100]"
+      :page-size="pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="400">
+    </el-pagination>
   </div>
 </template>
 
@@ -135,7 +144,9 @@ export default {
   name: 'exportExcel',
   data() {
     return {
-      list: null,
+      currentPage: 1,
+      pageSize: 10,
+      list: [],
       listLoading: true,
       downloadLoading: false,
       filename: 'data',
@@ -144,7 +155,8 @@ export default {
         order_date: '',
         order_path: '',
         order_station: '',
-        order_class: ''
+        order_class: '',
+        limit: 100000
       },
       orderData: [
         {
@@ -209,6 +221,9 @@ export default {
     this.fetchData()
   },
   computed: {
+    getList() {
+      return this.list.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+    },
     getPath() {
       return this.orderData.map(item => item.name)
     },
@@ -239,6 +254,12 @@ export default {
     }
   },
   methods: {
+    handleSizeChange(val) {
+      this.pageSize = val
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val
+    },
     fetchData() {
       this.listLoading = true
       fetchCboOrder(this.query).then(response => {
@@ -270,7 +291,7 @@ export default {
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
+        if (j === 'create_time') {
           return parseTime(v[j])
         } else {
           return v[j]
