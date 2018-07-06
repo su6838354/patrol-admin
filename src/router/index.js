@@ -49,7 +49,32 @@ export const constantRouterMap = [
       component: () => import('@/views/cbo-order/index'),
       name: '订单查询',
       meta: { title: '订单查询', icon: 'documentation', noCache: true }
-    }]
+    },
+    {
+      path: 'index/type=help',
+      component: () => import('@/views/helper/index'),
+      name: '帮教人员',
+      meta: { title: '帮教人员', icon: 'documentation', noCache: true }
+    },
+    {
+      path: 'index/type=mediation',
+      component: () => import('@/views/helper/index'),
+      name: '调解员',
+      meta: { title: '调解员', icon: 'documentation', noCache: true }
+    },
+    {
+      path: 'index/type=guard',
+      component: () => import('@/views/helper/index'),
+      name: '负责人',
+      meta: { title: '负责人', icon: 'documentation', noCache: true }
+    },
+    {
+      path: 'index/type=police',
+      component: () => import('@/views/helper/index'),
+      name: '民警',
+      meta: { title: '民警', icon: 'documentation', noCache: true }
+    }
+    ]
   }
   // ,
   // {
