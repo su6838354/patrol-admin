@@ -254,7 +254,7 @@
     },
     computed: {
       getList() {
-        return this.list.((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+        return this.list.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
       },
       getPath() {
         return this.orderData.map(item => item.name)
