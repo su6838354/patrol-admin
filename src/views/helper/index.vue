@@ -84,7 +84,60 @@
           {{scope.row.order_mobile}}
         </template>
       </el-table-column>
+      <el-table-column label="处理" align="center">
+        <template slot-scope="scope">
+          <el-button type="primary" @click="dialogFormVisible = true">添加</el-button>
+        </template>
+      </el-table-column>
     </el-table>
+
+    <el-dialog title="添加人员" :visible.sync="dialogFormVisible">
+      <el-form class="form_body" :model="form">
+        <el-form-item label="姓名" :label-width="formLabelWidth">
+          <el-input v-model="form.name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="角色" :label-width="formLabelWidth">
+          <el-input v-model="form.role" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="性别" :label-width="formLabelWidth">
+          <el-radio-group v-model="form.sex">
+            <el-radio label="男"></el-radio>
+            <el-radio label="女"></el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="年龄" :label-width="formLabelWidth">
+          <el-input v-model="form.age" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="守护部位" :label-width="formLabelWidth">
+          <el-input v-model="form.watch" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="管辖区域" :label-width="formLabelWidth">
+          <el-input v-model="form.area" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="管辖时间" :label-width="formLabelWidth">
+          <el-input v-model="form.period" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="擅长" :label-width="formLabelWidth">
+          <el-input v-model="form.good" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="活动形式">
+          <el-input type="textarea" v-model="form.activity"></el-input>
+        </el-form-item>
+        <el-form-item label="路线规划">
+          <el-input type="textarea" v-model="form.path"></el-input>
+        </el-form-item>
+        <el-form-item label="案件处理">
+          <el-input type="textarea" v-model="form.caseDetail"></el-input>
+        </el-form-item>
+        <el-form-item label="警官详情">
+          <el-input type="textarea" v-model="form.detail"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addRole()">确 定</el-button>
+      </div>
+    </el-dialog>
     <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -98,7 +151,7 @@
 </template>
 
 <script>
-  import { fetchHelper } from '@/api/article'
+  import { fetchHelper, fetchAddPeople } from '../../api/article'
   import { parseTime } from '@/utils'
 
   export default {
@@ -176,7 +229,23 @@
               }
             ]
           }
-        ]
+        ],
+        dialogFormVisible: false,
+        form: {
+          name: '',
+          role: '',
+          sex: 0,
+          age: '',
+          watch: '',
+          area: '',
+          period: '',
+          good: '',
+          activity: '',
+          caseDetail: '',
+          path: '',
+          detail: ''
+        },
+        formLabelWidth: '10%'
       }
     },
     created() {
@@ -185,7 +254,7 @@
     },
     computed: {
       getList() {
-        return this.list.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+        return this.list.((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
       },
       getPath() {
         return this.orderData.map(item => item.name)
@@ -236,6 +305,28 @@
           this.listLoading = false
         })
       },
+      addRole() {
+        const data = {
+          name: this.name,
+          role: this.role,
+          sex: this.sex,
+          age: this.age,
+          watch: this.watch,
+          area: this.area,
+          period: this.period,
+          good: this.good,
+          activity: this.activity,
+          case: this.caseDetail,
+          path: this.path,
+          detail: this.detail
+        }
+        console.log(data)
+        fetchAddPeople(data).then(response => {
+          console.log(response)
+          this.list = response.data.data
+          this.listLoading = false
+        })
+      },
       handleDownload() {
         console.log(this.filename)
         if (!this.filename) {
@@ -270,12 +361,23 @@
   }
 </script>
 
-<style>
-  .radio-label {
+<style lang="scss">
+  .app-container {
+   .radio-label {
     font-size: 14px;
     color: #606266;
     line-height: 40px;
     padding: 0 12px 0 30px;
+   }
+    .form_body {
+      width: 70%;
+      position:relative;
+      margin:0 auto;
+      .el-form-item__content {
+        width:60%;
+      }
+    }
   }
+
 </style>
 
