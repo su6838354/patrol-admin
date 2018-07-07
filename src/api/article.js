@@ -63,3 +63,10 @@ export function fetchAddPeople(data) {
     data: data
   })
 }
+export function fetchUpdatePeople(data) {
+  return request({
+    url: 'http://security.weichongming.com/patrol/staff/update',
+    method: 'post',
+    data: data
+  })
+}

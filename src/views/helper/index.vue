@@ -24,69 +24,74 @@
       </el-select>
 
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">{{$t('table.search')}}</el-button>
+      <el-button class="filter-item add-button" type="primary" @click="updateRole('add')">添加</el-button>
     </div>
 
     <el-table :data="getList" v-loading.body="listLoading" element-loading-text="拼命加载中" border fit highlight-current-row>
       <el-table-column align="center" label='Id' width="95">
         <template slot-scope="scope">
-          {{scope.$index}}
+          {{scope.row.id}}
         </template>
       </el-table-column>
 
-      <el-table-column label="日期" width="120" align="center">
-        <template slot-scope="scope">
-          <!--<el-tag>{{scope.row.order_date}}</el-tag>-->
-          <i class="el-icon-time"></i>
-          <span>{{scope.row.order_date | parseTime('{y}-{m}-{d}')}}</span>
-        </template>
-      </el-table-column>
+      <!--<el-table-column label="日期" width="120" align="center">-->
+        <!--<template slot-scope="scope">-->
+          <!--&lt;!&ndash;<el-tag>{{scope.row.order_date}}</el-tag>&ndash;&gt;-->
+          <!--<i class="el-icon-time"></i>-->
+          <!--<span>{{scope.row.order_date | parseTime('{y}-{m}-{d}')}}</span>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
 
-
-      <el-table-column label="角色" width="115" align="center">
-        <template slot-scope="scope">
-          {{scope.row.order_path}}
-        </template>
-      </el-table-column>
+      <!--<el-table-column label="角色" width="115" align="center">-->
+        <!--<template slot-scope="scope">-->
+          <!--{{scope.row.name}}-->
+        <!--</template>-->
+      <!--</el-table-column>-->
 
 
       <el-table-column label="姓名" width="115" align="center">
         <template slot-scope="scope">
-          {{scope.row.order_station}}
+          {{scope.row.name}}
         </template>
       </el-table-column>
 
 
       <el-table-column label="性别" width="115" align="center">
         <template slot-scope="scope">
-          {{scope.row.order_class}}
+          {{scope.row.sex}}
         </template>
       </el-table-column>
 
       <el-table-column label="年龄" width="115" align="center">
         <template slot-scope="scope">
-          {{scope.row.order_owner}}
+          {{scope.row.age}}
         </template>
       </el-table-column>
 
 
       <el-table-column label="管辖区域" width="315" align="center">
         <template slot-scope="scope">
-          {{scope.row.order_mobile}}
+          {{scope.row.area}}
         </template>
       </el-table-column>
       <el-table-column label="擅长" width="315" align="center">
         <template slot-scope="scope">
-          {{scope.row.order_mobile}}
+          {{scope.row.good}}
         </template>
       </el-table-column>
       <el-table-column label="案件处理" align="center">
         <template slot-scope="scope">
-          {{scope.row.order_mobile}}
+          {{scope.row.case}}
+        </template>
+      </el-table-column>
+      <el-table-column label="详情" align="center">
+        <template slot-scope="scope">
+          {{scope.row.detail}}
         </template>
       </el-table-column>
       <el-table-column label="处理" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" @click="dialogFormVisible = true">添加</el-button>
+          <el-button type="primary" @click="updateRole('update',scope.row)">修改</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -101,8 +106,8 @@
         </el-form-item>
         <el-form-item label="性别" :label-width="formLabelWidth">
           <el-radio-group v-model="form.sex">
-            <el-radio label="男"></el-radio>
-            <el-radio label="女"></el-radio>
+            <el-radio label="1">男</el-radio>
+            <el-radio label="0">女</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="年龄" :label-width="formLabelWidth">
@@ -120,9 +125,6 @@
         <el-form-item label="擅长" :label-width="formLabelWidth">
           <el-input v-model="form.good" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="活动形式">
-          <el-input type="textarea" v-model="form.activity"></el-input>
-        </el-form-item>
         <el-form-item label="路线规划">
           <el-input type="textarea" v-model="form.path"></el-input>
         </el-form-item>
@@ -135,7 +137,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addRole()">确 定</el-button>
+        <el-button type="primary" @click="sumbitBtn()">确 定</el-button>
       </div>
     </el-dialog>
     <el-pagination
@@ -151,13 +153,14 @@
 </template>
 
 <script>
-  import { fetchHelper, fetchAddPeople } from '../../api/article'
+  import { fetchHelper, fetchAddPeople, fetchUpdatePeople } from '../../api/article'
   import { parseTime } from '@/utils'
 
   export default {
     name: 'exportExcel',
     data() {
       return {
+        id: '',
         role: this.$route.query.type,
         currentPage: 1,
         pageSize: 10,
@@ -234,13 +237,13 @@
         form: {
           name: '',
           role: '',
-          sex: 0,
+          sex: '0',
           age: '',
           watch: '',
           area: '',
           period: '',
           good: '',
-          activity: '',
+          avatar: '',
           caseDetail: '',
           path: '',
           detail: ''
@@ -286,6 +289,71 @@
       }
     },
     methods: {
+//     更新与添加
+      updateRole(param, row) {
+        this.dialogFormVisible = true
+        if (param === 'update') {
+          this.form.name = row.name,
+          this.form.sex = row.sex,
+          this.form.age = row.age,
+          this.form.watch = row.watch,
+          this.form.area = row.area,
+          this.form.period = row.period,
+          this.form.good = row.good,
+          this.form.avatar = row.avatar,
+          this.form.caseDetail = row.caseDetail,
+          this.form.path = row.path,
+          this.form.detail = row.detail,
+          this.id = row.id
+        }
+        if (param === 'add') {
+          this.form.name = '',
+          this.form.sex = '',
+          this.form.age = '',
+          this.form.watch = '',
+          this.form.area = '',
+          this.form.period = '',
+          this.form.good = '',
+          this.form.avatar = '',
+          this.form.caseDetail = '',
+          this.form.path = '',
+          this.form.detail = '',
+          this.id = ''
+        }
+      },
+      // 人员更新
+      updateFatch() {
+        const data = {
+          id: this.id,
+          type: this.role,
+          name: this.form.name,
+          sex: this.form.sex,
+          age: this.form.age,
+          watch: this.form.watch,
+          area: this.form.area,
+          period: this.form.period,
+          good: this.form.good,
+          avatar: '',
+          case: this.form.caseDetail,
+          path: this.form.path,
+          detail: this.form.detail
+        }
+        fetchUpdatePeople(data).then(response => {
+          if (response.data.code === 0) {
+            this.list = response.data.data
+            this.dialogFormVisible = false
+            this.listLoading = false
+          }
+        })
+      },
+      // 提交
+      sumbitBtn() {
+        if (this.id === '') {
+          this.addRole()
+        } else {
+          this.updateFatch()
+        }
+      },
       handleSizeChange(val) {
         this.pageSize = val
       },
@@ -300,31 +368,34 @@
           offset: 0
         }
         fetchHelper(data).then(response => {
-          console.log(response)
-          this.list = response.data.data
-          this.listLoading = false
+          if (response.data.code === 0) {
+            this.list = response.data.data
+            this.listLoading = false
+          }
         })
       },
       addRole() {
         const data = {
-          name: this.name,
-          role: this.role,
-          sex: this.sex,
-          age: this.age,
-          watch: this.watch,
-          area: this.area,
-          period: this.period,
-          good: this.good,
-          activity: this.activity,
-          case: this.caseDetail,
-          path: this.path,
-          detail: this.detail
+          id: '',
+          type: this.role,
+          name: this.form.name,
+          sex: this.form.sex,
+          age: this.form.age,
+          watch: this.form.watch,
+          area: this.form.area,
+          period: this.form.period,
+          good: this.form.good,
+          avatar: '',
+          case: this.form.caseDetail,
+          path: this.form.path,
+          detail: this.form.detail
         }
-        console.log(data)
+        alert(data)
         fetchAddPeople(data).then(response => {
           console.log(response)
           this.list = response.data.data
           this.listLoading = false
+          this.dialogFormVisible = false
         })
       },
       handleDownload() {
@@ -369,12 +440,19 @@
     line-height: 40px;
     padding: 0 12px 0 30px;
    }
+    .add-button {
+      float:right;
+      margin-right:10%;
+    }
     .form_body {
       width: 70%;
       position:relative;
       margin:0 auto;
       .el-form-item__content {
         width:60%;
+      }
+      .el-textarea__inner {
+        margin-left:16%;
       }
     }
   }
