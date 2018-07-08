@@ -5,6 +5,7 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/views/layout/Layout'
+import Chat from '@/views/chat/index';
 
 /** note: submenu only apppear when children.length>=1
 *   detail see  https://panjiachen.github.io/vue-element-admin-site/#/router-and-nav?id=sidebar
@@ -43,7 +44,7 @@ export const constantRouterMap = [
   {
     path: '/cbo_order',
     component: Layout,
-    redirect: '/cbo_order/index',
+    redirect: '/cbo_order/index/type=help',
     name: '',
     meta: { title: '人员信息', icon: 'documentation', noCache: true },
     children: [{
@@ -71,7 +72,13 @@ export const constantRouterMap = [
       meta: { title: '民警', icon: 'documentation', noCache: true }
     }
     ]
-  }
+  },
+  {
+    path: '/chat',
+    component: Layout,
+    redirect: '/chat/index',
+    children: [{ path: 'index', component: () => import('@/views/chat/index'), name: 'chat', meta: { title: '聊天' }}]
+  },
   // {
   //   path: '/documentation',
   //   component: Layout,
