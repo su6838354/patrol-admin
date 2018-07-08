@@ -6,24 +6,18 @@
     <el-input style='width:340px;' :placeholder="$t('excel.placeholder')" prefix-icon="el-icon-document" v-model="filename"></el-input>
     <el-button style='margin:0 0 20px 20px;' type="primary" icon="document" @click="handleDownload" :loading="downloadLoading">{{$t('excel.export')}} excel</el-button>
     <div class="filter-container">
-      <el-date-picker  @keyup.enter.native="fetchData" style="width: 200px;" class="filter-item" v-model="query.order_date" value-format="yyyy-MM-dd" format="yyyy-MM-dd" type="date" :placeholder="'日期'"></el-date-picker>
+      <!--<el-select clearable style="width: 200px" class="filter-item" v-model="query.order_path" :placeholder="'线路'">-->
+        <!--<el-option v-for="item in getPath" :key="item" :label="item" :value="item">-->
+        <!--</el-option>-->
+      <!--</el-select>-->
+      <el-input
+        placeholder="请输入姓名"
+        v-model="searchName"
+        class="search-input"
+        clearable>
+      </el-input>
 
-      <el-select clearable style="width: 200px" class="filter-item" v-model="query.order_path" :placeholder="'线路'">
-        <el-option v-for="item in getPath" :key="item" :label="item" :value="item">
-        </el-option>
-      </el-select>
-
-      <el-select clearable style="width: 200px" class="filter-item" v-model="query.order_station" :placeholder="'站点'">
-        <el-option v-for="item in getStation" :key="item" :label="item" :value="item">
-        </el-option>
-      </el-select>
-
-      <el-select clearable style="width: 200px" class="filter-item" v-model="query.order_class" :placeholder="'班次'">
-        <el-option v-for="item in getClass" :key="item" :label="item" :value="item">
-        </el-option>
-      </el-select>
-
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">{{$t('table.search')}}</el-button>
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="getName()">{{$t('table.search')}}</el-button>
       <el-button class="filter-item add-button" type="primary" @click="updateRole('add',{})">添加</el-button>
     </div>
 
@@ -41,7 +35,7 @@
       </el-table-column>
       <el-table-column label="性别" width="115" align="center">
         <template slot-scope="scope">
-          {{scope.row.sex === '1' ? '男' : '女'}}
+          {{scope.row.sex === 1 ? '男' : '女'}}
         </template>
       </el-table-column>
 
@@ -51,42 +45,22 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="擅长" width="315" align="center">
+      <el-table-column  label="管辖区域"  v-if="this.role !== 'guard'" align="center">
+        <template slot-scope="scope">
+          {{scope.row.area}}
+        </template>
+      </el-table-column>
+
+      <el-table-column label="擅长" v-if="this.role !== 'guard'" align="center">
         <template slot-scope="scope">
           {{scope.row.good}}
         </template>
       </el-table-column>
-      <el-table-column label="管辖区域" width="315" align="center">
-        <template slot-scope="scope">
-          {{scope.row.area}}
-        </template>
-      </el-table-column>
 
-      <el-table-column label="管辖时间" width="315" align="center">
-        <template slot-scope="scope">
-          {{scope.row.area}}
-        </template>
-      </el-table-column>
-      <el-table-column label="路线规划" align="center">
-        <template slot-scope="scope">
-          {{scope.row.path}}
-        </template>
-      </el-table-column>
-      <el-table-column label="守护部位" align="center">
-        <template slot-scope="scope">
-          {{scope.row.path}}
-        </template>
-      </el-table-column>
 
-      <el-table-column label="案件处理" align="center">
+      <el-table-column  v-if ="this.role === 'mediation'" label="案件处理" align="center">
         <template slot-scope="scope">
           {{scope.row.case}}
-        </template>
-      </el-table-column>
-
-      <el-table-column label="详情" align="center">
-        <template slot-scope="scope">
-          {{scope.row.detail}}
         </template>
       </el-table-column>
 
@@ -95,6 +69,39 @@
           <el-button type="primary" @click="updateRole('update',scope.row)">修改</el-button>
         </template>
       </el-table-column>
+
+
+  <div v-if="this.role === 'guard'">
+    <el-table-column label="守护部位" align="center">
+      <template slot-scope="scope">
+        {{scope.row.path}}
+      </template>
+    </el-table-column>
+      <el-table-column  label="管辖时间" width="315" align="center">
+        <template slot-scope="scope">
+          {{scope.row.area}}
+        </template>
+      </el-table-column>
+
+      <el-table-column label="路线规划" align="center">
+        <template slot-scope="scope">
+          {{scope.row.path}}
+        </template>
+      </el-table-column>
+
+  </div>
+      <div v-if="this.role === 'police'" >
+      <el-table-column label="线上接单数" align="center">
+        <template slot-scope="scope">
+          {{scope.row.info_count}}
+        </template>
+      </el-table-column>
+      <el-table-column label="警官简介" align="center">
+        <template slot-scope="scope">
+          {{scope.row.detail}}
+        </template>
+      </el-table-column>
+      </div>
     </el-table>
 
     <el-dialog title="添加人员" :visible.sync="dialogFormVisible">
@@ -109,30 +116,31 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="年龄" :label-width="formLabelWidth">
-          <el-input v-model="form.age" auto-complete="off" type="number"></el-input>
+          <el-input v-model="form.age" auto-complete="off" type="number" :min="10" :max="120"></el-input>
         </el-form-item>
-        <el-form-item label="管辖区域" :label-width="formLabelWidth">
+        <el-form-item label="管辖区域" v-if="this.role !== 'guard'" :label-width="formLabelWidth">
           <el-input v-model="form.area" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="擅长" :label-width="formLabelWidth">
-          <el-input v-model="form.good" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="守护部位" :label-width="formLabelWidth">
+        <el-form-item  v-if="this.role === 'guard'" label="守护部位" :label-width="formLabelWidth">
           <el-input v-model="form.watch" auto-complete="off"></el-input>
         </el-form-item>
 
-        <el-form-item label="管辖时间" :label-width="formLabelWidth">
+        <el-form-item v-if="this.role === 'guard'" label="管辖时间" :label-width="formLabelWidth">
           <el-input v-model="form.period" auto-complete="off"></el-input>
         </el-form-item>
 
-        <el-form-item label="路线规划">
+        <el-form-item  v-if="this.role === 'guard'" label="路线规划" :label-width="formLabelWidth">
           <el-input type="textarea" v-model="form.path"></el-input>
         </el-form-item>
-        <el-form-item label="案件处理">
+        <el-form-item label="擅长" v-if="this.role !== 'guard'" :label-width="formLabelWidth">
+          <el-input type="textarea"  v-model="form.good" auto-complete="off"></el-input>
+        </el-form-item>
+
+        <el-form-item label="案件处理" v-if ="this.role === 'mediation'" :label-width="formLabelWidth" >
           <el-input type="textarea" v-model="form.caseDetail"></el-input>
         </el-form-item>
-        <el-form-item label="警官详情">
-          <el-input type="textarea" v-model="form.detail"></el-input>
+        <el-form-item label="警官简介" v-if ="this.role === 'police'" :label-width="formLabelWidth">
+          <el-input type="textarea" v-model="form.detail" ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -169,70 +177,8 @@
         downloadLoading: false,
         filename: 'data',
         autoWidth: true,
-        query: {
-          order_date: '',
-          order_path: '',
-          order_station: '',
-          order_class: '',
-          limit: 100000
-        },
-        orderData: [
-          {
-            name: '旅游1线',
-            stations: [
-              {
-                name: '南门水陆换乘中心',
-                classes: [
-                  {
-                    time: '9:00'
-                  },
-                  {
-                    time: '13:20'
-                  }
-                ]
-              },
-              {
-                name: '前卫村',
-                classes: [
-                  {
-                    time: '11:00'
-                  },
-                  {
-                    time: '15:40'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: '旅游2线',
-            stations: [
-              {
-                name: '南门水陆换乘中心',
-                classes: [
-                  {
-                    id: 'path_2,point_nanmen,9:00', // 代码按规则自动生成
-                    time: '9:00'
-                  },
-                  {
-                    time: '13:20'
-                  }
-                ]
-              },
-              {
-                name: '明珠湖公园',
-                classes: [
-                  {
-                    time: '11:00'
-                  },
-                  {
-                    time: '15:40'
-                  }
-                ]
-              }
-            ]
-          }
-        ],
+        searchName: '',
+        allPeople: [],
         form: {
           name: '',
           role: '',
@@ -255,41 +201,21 @@
       this.role = this.$route.name
       this.fetchData()
     },
-    computed: {
-      getPath() {
-        return this.orderData.map(item => item.name)
-      },
-      getStation() {
-        const selectPath = this.orderData.filter(path => path.name === this.query.order_path)
-        if (selectPath && selectPath.length > 0) {
-          return selectPath[0].stations.map(station => {
-            return station.name
-          })
-        }
-        return []
-      },
-      getClass() {
-        const selectPath = this.orderData.filter(path => path.name === this.query.order_path)
-        if (selectPath && selectPath.length > 0) {
-          const stations = selectPath[0].stations
-          // console.log(selectPath, '1112')
-          // console.log(stations, '111')
-          const selectStations = stations.filter(station => station.name === this.query.order_station)
-          if (selectStations && selectStations.length > 0) {
-            const classes = selectStations[0].classes
-            return classes.map(cls => {
-              return cls.time
-            })
-          }
-        }
-        return []
-      }
-    },
     methods: {
+      getName() {
+        this.list = this.allPeople
+        var searchList = []
+        this.list.forEach((e) => {
+          if (e.name === this.searchName) {
+            searchList.push(e)
+          }
+        })
+        this.list = searchList
+      },
       updateRole(param, row) {
         if (param === 'update') {
           this.form.name = row.name
-          this.form.sex = row.sex
+          this.form.sex = row.sex.toString()
           this.form.age = row.age
           this.form.watch = row.watch
           this.form.area = row.area
@@ -339,6 +265,7 @@
             this.listLoading = false
             this.dialogFormVisible = false
             this.$message.success('更新成功!')
+            this.fetchData()
           } else {
             this.$message.error('更新失败!')
           }
@@ -369,7 +296,7 @@
         fetchHelper(data).then(response => {
           if (response.data.code === 0) {
             this.list = response.data.data
-            console.log(this.list)
+            this.allPeople = response.data.data
             this.listLoading = false
           }
         })
@@ -456,8 +383,8 @@
         }
         if (this.role === 'police') {
           import('@/vendor/Export2Excel').then(excel => {
-            const tHeader = ['Id', '姓名', '详情']
-            const filterVal = ['id', 'name', 'detail']
+            const tHeader = ['Id', '姓名', '警官简介', '线上接单数']
+            const filterVal = ['id', 'name', 'detail', 'info_count']
             const list = this.list
             const data = this.formatJson(filterVal, list)
             excel.export_json_to_excel({
@@ -485,6 +412,11 @@
 
 <style lang="scss">
   .app-container {
+    .search-input {
+      width:260px;
+      float:left;
+      margin-right:20px;
+    }
    .radio-label {
     font-size: 14px;
     color: #606266;
@@ -501,9 +433,6 @@
       margin:0 auto;
       .el-form-item__content {
         width:60%;
-      }
-      .el-textarea__inner {
-        margin-left:16%;
       }
     }
   }
