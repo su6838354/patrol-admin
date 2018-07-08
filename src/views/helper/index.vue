@@ -27,7 +27,7 @@
       <el-button class="filter-item add-button" type="primary" @click="updateRole('add',{})">添加</el-button>
     </div>
 
-    <el-table :data="getList" v-loading.body="listLoading" element-loading-text="拼命加载中" border fit highlight-current-row>
+    <el-table :data="this.list" v-loading.body="listLoading" element-loading-text="拼命加载中" border fit highlight-current-row>
 
       <el-table-column align="center" label='Id' width="95">
         <template slot-scope="scope">
@@ -41,7 +41,7 @@
       </el-table-column>
       <el-table-column label="性别" width="115" align="center">
         <template slot-scope="scope">
-          {{scope.row.sex}}
+          {{scope.row.sex === '1' ? '男' : '女'}}
         </template>
       </el-table-column>
 
@@ -102,9 +102,6 @@
         <el-form-item label="姓名" :label-width="formLabelWidth">
           <el-input v-model="form.name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="角色" :label-width="formLabelWidth">
-          <el-input v-model="form.role" auto-complete="off"></el-input>
-        </el-form-item>
         <el-form-item label="性别" :label-width="formLabelWidth">
           <el-radio-group v-model="form.sex">
             <el-radio label="1">男</el-radio>
@@ -112,7 +109,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="年龄" :label-width="formLabelWidth">
-          <el-input v-model="form.age" auto-complete="off"></el-input>
+          <el-input v-model="form.age" auto-complete="off" type="number"></el-input>
         </el-form-item>
         <el-form-item label="管辖区域" :label-width="formLabelWidth">
           <el-input v-model="form.area" auto-complete="off"></el-input>
@@ -164,7 +161,7 @@
     data() {
       return {
         id: '',
-        role: this.$route.query.type,
+        role: '',
         currentPage: 1,
         pageSize: 10,
         list: [],
@@ -255,13 +252,10 @@
       }
     },
     created() {
-      this.role = this.$route.query.type
+      this.role = this.$route.name
       this.fetchData()
     },
     computed: {
-      getList() {
-        return this.list.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
-      },
       getPath() {
         return this.orderData.map(item => item.name)
       },
@@ -342,9 +336,11 @@
         }
         fetchUpdatePeople(data).then(response => {
           if (response.data.code === 0) {
-            this.list = response.data.data
             this.listLoading = false
             this.dialogFormVisible = false
+            this.$message.success('更新成功!')
+          } else {
+            this.$message.error('更新失败!')
           }
         })
       },
@@ -361,17 +357,19 @@
       },
       handleCurrentChange(val) {
         this.currentPage = val
+        this.fetchData()
       },
       fetchData() {
         this.listLoading = true
         const data = {
           type: this.role,
           limit: this.pageSize,
-          offset: this.currentPage
+          offset: (this.currentPage - 1) * 10
         }
         fetchHelper(data).then(response => {
           if (response.data.code === 0) {
             this.list = response.data.data
+            console.log(this.list)
             this.listLoading = false
           }
         })

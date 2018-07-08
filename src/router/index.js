@@ -71,18 +71,18 @@ export const constantRouterMap = [
       meta: { title: '民警', icon: 'documentation', noCache: true }
     }
     ]
-  },
-  {
-    path: '/documentation',
-    component: Layout,
-    redirect: '/documentation/index',
-    children: [{
-      path: 'index',
-      component: () => import('@/views/documentation/index'),
-      name: 'documentation',
-      meta: { title: 'documentation', icon: 'documentation', noCache: true }
-    }]
-  },
+  }
+  // {
+  //   path: '/documentation',
+  //   component: Layout,
+  //   redirect: '/documentation/index',
+  //   children: [{
+  //     path: 'index',
+  //     component: () => import('@/views/documentation/index'),
+  //     name: 'documentation',
+  //     meta: { title: 'documentation', icon: 'documentation', noCache: true }
+  //   }]
+  // },
   // {
   //   path: '/guide',
   //   component: Layout,
