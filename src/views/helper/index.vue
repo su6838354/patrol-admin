@@ -24,38 +24,21 @@
       </el-select>
 
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">{{$t('table.search')}}</el-button>
-      <el-button class="filter-item add-button" type="primary" @click="updateRole('add')">添加</el-button>
+      <el-button class="filter-item add-button" type="primary" @click="updateRole('add',{})">添加</el-button>
     </div>
 
     <el-table :data="getList" v-loading.body="listLoading" element-loading-text="拼命加载中" border fit highlight-current-row>
+
       <el-table-column align="center" label='Id' width="95">
         <template slot-scope="scope">
           {{scope.row.id}}
         </template>
       </el-table-column>
-
-      <!--<el-table-column label="日期" width="120" align="center">-->
-        <!--<template slot-scope="scope">-->
-          <!--&lt;!&ndash;<el-tag>{{scope.row.order_date}}</el-tag>&ndash;&gt;-->
-          <!--<i class="el-icon-time"></i>-->
-          <!--<span>{{scope.row.order_date | parseTime('{y}-{m}-{d}')}}</span>-->
-        <!--</template>-->
-      <!--</el-table-column>-->
-
-      <!--<el-table-column label="角色" width="115" align="center">-->
-        <!--<template slot-scope="scope">-->
-          <!--{{scope.row.name}}-->
-        <!--</template>-->
-      <!--</el-table-column>-->
-
-
       <el-table-column label="姓名" width="115" align="center">
         <template slot-scope="scope">
           {{scope.row.name}}
         </template>
       </el-table-column>
-
-
       <el-table-column label="性别" width="115" align="center">
         <template slot-scope="scope">
           {{scope.row.sex}}
@@ -68,27 +51,45 @@
         </template>
       </el-table-column>
 
-
-      <el-table-column label="管辖区域" width="315" align="center">
-        <template slot-scope="scope">
-          {{scope.row.area}}
-        </template>
-      </el-table-column>
       <el-table-column label="擅长" width="315" align="center">
         <template slot-scope="scope">
           {{scope.row.good}}
         </template>
       </el-table-column>
+      <el-table-column label="管辖区域" width="315" align="center">
+        <template slot-scope="scope">
+          {{scope.row.area}}
+        </template>
+      </el-table-column>
+
+      <el-table-column label="管辖时间" width="315" align="center">
+        <template slot-scope="scope">
+          {{scope.row.area}}
+        </template>
+      </el-table-column>
+      <el-table-column label="路线规划" align="center">
+        <template slot-scope="scope">
+          {{scope.row.path}}
+        </template>
+      </el-table-column>
+      <el-table-column label="守护部位" align="center">
+        <template slot-scope="scope">
+          {{scope.row.path}}
+        </template>
+      </el-table-column>
+
       <el-table-column label="案件处理" align="center">
         <template slot-scope="scope">
           {{scope.row.case}}
         </template>
       </el-table-column>
+
       <el-table-column label="详情" align="center">
         <template slot-scope="scope">
           {{scope.row.detail}}
         </template>
       </el-table-column>
+
       <el-table-column label="处理" align="center">
         <template slot-scope="scope">
           <el-button type="primary" @click="updateRole('update',scope.row)">修改</el-button>
@@ -113,18 +114,20 @@
         <el-form-item label="年龄" :label-width="formLabelWidth">
           <el-input v-model="form.age" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="守护部位" :label-width="formLabelWidth">
-          <el-input v-model="form.watch" auto-complete="off"></el-input>
-        </el-form-item>
         <el-form-item label="管辖区域" :label-width="formLabelWidth">
           <el-input v-model="form.area" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="管辖时间" :label-width="formLabelWidth">
-          <el-input v-model="form.period" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="擅长" :label-width="formLabelWidth">
           <el-input v-model="form.good" auto-complete="off"></el-input>
         </el-form-item>
+        <el-form-item label="守护部位" :label-width="formLabelWidth">
+          <el-input v-model="form.watch" auto-complete="off"></el-input>
+        </el-form-item>
+
+        <el-form-item label="管辖时间" :label-width="formLabelWidth">
+          <el-input v-model="form.period" auto-complete="off"></el-input>
+        </el-form-item>
+
         <el-form-item label="路线规划">
           <el-input type="textarea" v-model="form.path"></el-input>
         </el-form-item>
@@ -137,7 +140,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="sumbitBtn()">确 定</el-button>
+        <el-button type="primary" @click="sumbitBtn">确 定</el-button>
       </div>
     </el-dialog>
     <el-pagination
@@ -233,7 +236,6 @@
             ]
           }
         ],
-        dialogFormVisible: false,
         form: {
           name: '',
           role: '',
@@ -248,7 +250,8 @@
           path: '',
           detail: ''
         },
-        formLabelWidth: '10%'
+        formLabelWidth: '10%',
+        dialogFormVisible: false
       }
     },
     created() {
@@ -289,40 +292,39 @@
       }
     },
     methods: {
-//     更新与添加
       updateRole(param, row) {
-        this.dialogFormVisible = true
         if (param === 'update') {
-          this.form.name = row.name,
-          this.form.sex = row.sex,
-          this.form.age = row.age,
-          this.form.watch = row.watch,
-          this.form.area = row.area,
-          this.form.period = row.period,
-          this.form.good = row.good,
-          this.form.avatar = row.avatar,
-          this.form.caseDetail = row.caseDetail,
-          this.form.path = row.path,
-          this.form.detail = row.detail,
+          this.form.name = row.name
+          this.form.sex = row.sex
+          this.form.age = row.age
+          this.form.watch = row.watch
+          this.form.area = row.area
+          this.form.period = row.period
+          this.form.good = row.good
+          this.form.avatar = row.avatar
+          this.form.caseDetail = row.caseDetail
+          this.form.path = row.path
+          this.form.detail = row.detail
           this.id = row.id
         }
         if (param === 'add') {
-          this.form.name = '',
-          this.form.sex = '',
-          this.form.age = '',
-          this.form.watch = '',
-          this.form.area = '',
-          this.form.period = '',
-          this.form.good = '',
-          this.form.avatar = '',
-          this.form.caseDetail = '',
-          this.form.path = '',
-          this.form.detail = '',
+          this.form.name = ''
+          this.form.sex = ''
+          this.form.age = ''
+          this.form.watch = ''
+          this.form.area = ''
+          this.form.period = ''
+          this.form.good = ''
+          this.form.avatar = ''
+          this.form.caseDetail = ''
+          this.form.path = ''
+          this.form.detail = ''
           this.id = ''
         }
+        this.dialogFormVisible = true
       },
       // 人员更新
-      updateFatch() {
+      updateFetch() {
         const data = {
           id: this.id,
           type: this.role,
@@ -341,8 +343,8 @@
         fetchUpdatePeople(data).then(response => {
           if (response.data.code === 0) {
             this.list = response.data.data
-            this.dialogFormVisible = false
             this.listLoading = false
+            this.dialogFormVisible = false
           }
         })
       },
@@ -351,7 +353,7 @@
         if (this.id === '') {
           this.addRole()
         } else {
-          this.updateFatch()
+          this.updateFetch()
         }
       },
       handleSizeChange(val) {
@@ -364,8 +366,8 @@
         this.listLoading = true
         const data = {
           type: this.role,
-          limit: 10,
-          offset: 0
+          limit: this.pageSize,
+          offset: this.currentPage
         }
         fetchHelper(data).then(response => {
           if (response.data.code === 0) {
@@ -390,9 +392,7 @@
           path: this.form.path,
           detail: this.form.detail
         }
-        alert(data)
         fetchAddPeople(data).then(response => {
-          console.log(response)
           this.list = response.data.data
           this.listLoading = false
           this.dialogFormVisible = false
@@ -405,19 +405,67 @@
           return
         }
         this.downloadLoading = true
-        import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['Id', '日期', '角色', '姓名', '性别', '年龄', '管辖区域', '擅长', '案件处理']
-          const filterVal = ['id', 'order_date', 'order_path', 'order_station', 'order_class', 'order_owner', 'order_mobile', 'create_time', 'status']
-          const list = this.list
-          const data = this.formatJson(filterVal, list)
-          excel.export_json_to_excel({
-            header: tHeader,
-            data,
-            filename: this.filename,
-            autoWidth: this.autoWidth
+        if (this.role === 'help') {
+          import('@/vendor/Export2Excel').then(excel => {
+            const tHeader = ['Id', '姓名', '性别', '年龄', '管辖区域', '擅长'];
+            const filterVal = ['id', 'name', 'sex', 'age', 'area', 'good'];
+            const list = this.list
+            const data = this.formatJson(filterVal, list)
+            excel.export_json_to_excel({
+              header: tHeader,
+              data,
+              filename: this.filename,
+              autoWidth: this.autoWidth
+            })
+            this.downloadLoading = false
           })
-          this.downloadLoading = false
-        })
+        }
+        if (this.role === 'mediation') {
+          import('@/vendor/Export2Excel').then(excel => {
+            const tHeader = ['Id', '姓名', '性别', '年龄', '管辖区域', '擅长', '案件处理'];
+            const filterVal = ['id', 'name', 'sex', 'age', 'area', 'good', 'case'];
+            const list = this.list
+            const data = this.formatJson(filterVal, list)
+            excel.export_json_to_excel({
+              header: tHeader,
+              data,
+              filename: this.filename,
+              autoWidth: this.autoWidth
+            })
+            this.downloadLoading = false
+          })
+        }
+        if (this.role === 'guard') {
+          import('@/vendor/Export2Excel').then(excel => {
+            const tHeader = ['Id', '姓名', '守护部位', '性别', '年龄', '管辖时间', '路线规划']
+            const filterVal = ['id', 'name', 'watch', 'sex', 'age', 'period', 'path']
+            const list = this.list
+            const data = this.formatJson(filterVal, list)
+            excel.export_json_to_excel({
+              header: tHeader,
+              data,
+              filename: this.filename,
+              autoWidth: this.autoWidth
+            })
+            this.downloadLoading = false
+          })
+        }
+        if (this.role === 'police') {
+          import('@/vendor/Export2Excel').then(excel => {
+            const tHeader = ['Id', '姓名', '详情']
+            const filterVal = ['id', 'name', 'detail']
+            const list = this.list
+            const data = this.formatJson(filterVal, list)
+            excel.export_json_to_excel({
+              header: tHeader,
+              data,
+              filename: this.filename,
+              autoWidth: this.autoWidth
+            })
+            this.downloadLoading = false
+          })
+        }
+
       },
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => {
