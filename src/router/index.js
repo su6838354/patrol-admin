@@ -41,34 +41,60 @@ export const constantRouterMap = [
   //   }]
   // },
   {
-    path: '/cbo_order',
+    path: '/helper',
     component: Layout,
-    redirect: '/cbo_order/index',
+    redirect: '/helper/index',
     name: '',
     meta: { title: '人员信息', icon: 'documentation', noCache: true },
     children: [{
-      path: 'index/type=help',
+      path: 'type=help',
       component: () => import('@/views/helper/index'),
       name: 'help',
       meta: { title: '帮教人员', icon: 'documentation', noCache: true }
     },
     {
-      path: 'index/type=mediation',
+      path: 'type=mediation',
       component: () => import('@/views/helper/index'),
       name: 'mediation',
       meta: { title: '调解员', icon: 'documentation', noCache: true }
     },
     {
-      path: 'index/type=guard',
+      path: 'type=guard',
       component: () => import('@/views/helper/index'),
       name: 'guard',
       meta: { title: '负责人', icon: 'documentation', noCache: true }
     },
     {
-      path: 'index/type=police',
+      path: 'type=police',
       component: () => import('@/views/helper/index'),
       name: 'police',
       meta: { title: '民警', icon: 'documentation', noCache: true }
+    }
+    ]
+  },
+  {
+    path: '/feed-back',
+    component: Layout,
+    redirect: '/feed-back/index',
+    name: '',
+    meta: { title: '反馈与预约', icon: 'documentation', noCache: true },
+    children: [{
+      path: 'type=people',
+      component: () => import('@/views/feed-back/index'),
+      name: 'people',
+      meta: { title: '民情反馈', icon: 'documentation', noCache: true }
+    },
+    {
+      path: 'type=govern',
+      component: () => import('@/views/feed-back/index'),
+      name: 'govern',
+      meta: { title: '政务反馈', icon: 'documentation', noCache: true }
+    },
+    {
+      path: 'type=yuyue',
+      component: () => import('@/views/feed-back/index'),
+      name: 'yuyue',
+      meta: { title: '预约办事', icon: 'documentation', noCache: true }
     }
     ]
   }
