@@ -392,10 +392,16 @@
           path: this.form.path,
           detail: this.form.detail
         }
-        fetchAddPeople(data).then(response => {
-          this.list = response.data.data
-          this.listLoading = false
-          this.dialogFormVisible = false
+        fetchAddPeople(data).then(({ data: response }) => {
+          if (response.code === 0) {
+            data.id = response.data.insertId - 1
+            this.list.unshift(data)
+            this.listLoading = false
+            this.dialogFormVisible = false
+            this.$message.success('添加成功!')
+          } else {
+            this.$message.error('添加失败!')
+          }
         })
       },
       handleDownload() {
@@ -407,8 +413,8 @@
         this.downloadLoading = true
         if (this.role === 'help') {
           import('@/vendor/Export2Excel').then(excel => {
-            const tHeader = ['Id', '姓名', '性别', '年龄', '管辖区域', '擅长'];
-            const filterVal = ['id', 'name', 'sex', 'age', 'area', 'good'];
+            const tHeader = ['Id', '姓名', '性别', '年龄', '管辖区域', '擅长']
+            const filterVal = ['id', 'name', 'sex', 'age', 'area', 'good']
             const list = this.list
             const data = this.formatJson(filterVal, list)
             excel.export_json_to_excel({
@@ -422,8 +428,8 @@
         }
         if (this.role === 'mediation') {
           import('@/vendor/Export2Excel').then(excel => {
-            const tHeader = ['Id', '姓名', '性别', '年龄', '管辖区域', '擅长', '案件处理'];
-            const filterVal = ['id', 'name', 'sex', 'age', 'area', 'good', 'case'];
+            const tHeader = ['Id', '姓名', '性别', '年龄', '管辖区域', '擅长', '案件处理']
+            const filterVal = ['id', 'name', 'sex', 'age', 'area', 'good', 'case']
             const list = this.list
             const data = this.formatJson(filterVal, list)
             excel.export_json_to_excel({
@@ -465,7 +471,6 @@
             this.downloadLoading = false
           })
         }
-
       },
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => {
