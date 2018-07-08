@@ -29,65 +29,60 @@ export const constantRouterMap = [
   { path: '/authredirect', component: () => import('@/views/login/authredirect'), hidden: true },
   { path: '/404', component: () => import('@/views/errorPage/404'), hidden: true },
   { path: '/401', component: () => import('@/views/errorPage/401'), hidden: true },
-  //  {
-  //    path: '',
-  //    component: Layout,
-  //    redirect: 'dashboard',
-  //    children: [{
-  //      path: 'dashboard',
-  //      component: () => import('@/views/dashboard/index'),
-  //      name: 'dashboard',
-  //      meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
-  //    }]
-  //  },
+  // {
+  //   path: '',
+  //   component: Layout,
+  //   redirect: 'dashboard',
+  //   children: [{
+  //     path: 'dashboard',
+  //     component: () => import('@/views/dashboard/index'),
+  //     name: 'dashboard',
+  //     meta: {title: 'dashboard', icon: 'dashboard', noCache: true}
+  //   }]
+  // },
   {
     path: '/cbo_order',
     component: Layout,
     redirect: '/cbo_order/index',
+    name: '',
+    meta: { title: '人员信息', icon: 'documentation', noCache: true },
     children: [{
-      path: 'index',
-      component: () => import('@/views/cbo-order/index'),
-      name: '订单查询',
-      meta: { title: '订单查询', icon: 'documentation', noCache: true }
-    },
-    {
       path: 'index/type=help',
       component: () => import('@/views/helper/index'),
-      name: '帮教人员',
+      name: 'help',
       meta: { title: '帮教人员', icon: 'documentation', noCache: true }
     },
     {
       path: 'index/type=mediation',
       component: () => import('@/views/helper/index'),
-      name: '调解员',
+      name: 'mediation',
       meta: { title: '调解员', icon: 'documentation', noCache: true }
     },
     {
       path: 'index/type=guard',
       component: () => import('@/views/helper/index'),
-      name: '负责人',
+      name: 'guard',
       meta: { title: '负责人', icon: 'documentation', noCache: true }
     },
     {
       path: 'index/type=police',
       component: () => import('@/views/helper/index'),
-      name: '民警',
+      name: 'police',
       meta: { title: '民警', icon: 'documentation', noCache: true }
     }
     ]
-  }
-  // ,
-  // {
-  //   path: '/documentation',
-  //   component: Layout,
-  //   redirect: '/documentation/index',
-  //   children: [{
-  //     path: 'index',
-  //     component: () => import('@/views/documentation/index'),
-  //     name: 'documentation',
-  //     meta: { title: 'documentation', icon: 'documentation', noCache: true }
-  //   }]
-  // },
+  },
+  {
+    path: '/documentation',
+    component: Layout,
+    redirect: '/documentation/index',
+    children: [{
+      path: 'index',
+      component: () => import('@/views/documentation/index'),
+      name: 'documentation',
+      meta: { title: 'documentation', icon: 'documentation', noCache: true }
+    }]
+  },
   // {
   //   path: '/guide',
   //   component: Layout,
