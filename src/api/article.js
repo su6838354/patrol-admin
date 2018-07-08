@@ -70,3 +70,17 @@ export function fetchUpdatePeople(data) {
     data: data
   })
 }
+export function fetchFeedBack(data) {
+  return request({
+    url: 'http://security.weichongming.com/patrol/info/list',
+    method: 'post',
+    data: data
+  })
+}
+export function updateFeedBack(data) {
+  return request({
+    url: 'http://security.weichongming.com/patrol/info/update',
+    method: 'post',
+    data: data
+  })
+}
