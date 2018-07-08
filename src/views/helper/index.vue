@@ -12,7 +12,7 @@
       <!--</el-select>-->
       <el-input
         placeholder="请输入姓名"
-        v-model="searchName"
+        v-model="params.name"
         class="search-input"
         clearable>
       </el-input>
@@ -142,6 +142,14 @@
         <el-form-item label="警官简介" v-if ="this.role === 'police'" :label-width="formLabelWidth">
           <el-input type="textarea" v-model="form.detail" ></el-input>
         </el-form-item>
+
+        <el-form-item label="头像" :label-width="formLabelWidth">
+          <div>
+            <input type="file" id="add-file" @change="fileClick" />
+            <img v-if="imageUrl" width="200" height="200" v-bind:key="imageUrl" :src="imageUrl"/>
+            <span>上传文件（需小于10M）</span>
+          </div>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -155,7 +163,7 @@
       :page-sizes="[10, 20, 50, 100]"
       :page-size="pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400">
+      :total="total">
     </el-pagination>
   </div>
 </template>
@@ -163,11 +171,35 @@
 <script>
   import { fetchHelper, fetchAddPeople, fetchUpdatePeople } from '../../api/article'
   import { parseTime } from '@/utils'
+  import upyun from 'upyun';
+
+  function upload(file, cb) {
+    const path = '/sample-upload-' + file.name;
+    // client side only need bucket name
+    const bucket = new upyun.Bucket('sy-image-upyun');
+    function getHeaderSign(bucket, method) {
+      const params = 'bucket=' + bucket.bucketName + '&method=' + method + '&path=' + path;
+      return fetch('http://security.weichongming.com/patrol/image/sign/head?' + params)
+        .then(function(response) {
+          if (response.status !== 200) {
+            console.error('gen header sign faild!');
+            return;
+          }
+          return response.json()
+        })
+    }
+    const client = new upyun.Client(bucket, getHeaderSign);
+    client.putFile(path, file).then(function(result) {
+      const res = `http://sy-image-upyun.test.upcdn.net/${path}`;
+      cb({ code: result?0:-1, data: res });
+    });
+  }
 
   export default {
     name: 'exportExcel',
     data() {
       return {
+        imageUrl: '',
         id: '',
         role: '',
         currentPage: 1,
@@ -194,7 +226,11 @@
           detail: ''
         },
         formLabelWidth: '10%',
-        dialogFormVisible: false
+        dialogFormVisible: false,
+        params: {
+          name: ''
+        },
+        total: 0,
       }
     },
     created() {
@@ -203,14 +239,19 @@
     },
     methods: {
       getName() {
-        this.list = this.allPeople
-        var searchList = []
-        this.list.forEach((e) => {
-          if (e.name === this.searchName) {
-            searchList.push(e)
+        this.fetchData()
+      },
+      fileClick(e) {
+        const file = e.target.files[0];
+        this.$message.info('图片上传中...', 100000)
+        upload(file, ({code, data}) => {
+          if (code === 0)  {
+            this.imageUrl = data
+            this.$message.success('图片上传成功', 1);
+          } else {
+            this.$message.error('图片上传失败')
           }
         })
-        this.list = searchList
       },
       updateRole(param, row) {
         if (param === 'update') {
@@ -222,6 +263,7 @@
           this.form.period = row.period
           this.form.good = row.good
           this.form.avatar = row.avatar
+          this.imageUrl = row.avatar
           this.form.caseDetail = row.caseDetail
           this.form.path = row.path
           this.form.detail = row.detail
@@ -236,6 +278,7 @@
           this.form.period = ''
           this.form.good = ''
           this.form.avatar = ''
+          this.imageUrl = ''
           this.form.caseDetail = ''
           this.form.path = ''
           this.form.detail = ''
@@ -255,7 +298,7 @@
           area: this.form.area,
           period: this.form.period,
           good: this.form.good,
-          avatar: '',
+          avatar: this.imageUrl,
           case: this.form.caseDetail,
           path: this.form.path,
           detail: this.form.detail
@@ -293,11 +336,17 @@
           limit: this.pageSize,
           offset: (this.currentPage - 1) * 10
         }
+        for (const item in this.params) {
+          if (this.params[item]) {
+            data[item] = this.params[item]
+          }
+        }
         fetchHelper(data).then(response => {
           if (response.data.code === 0) {
             this.list = response.data.data
             this.allPeople = response.data.data
             this.listLoading = false
+            this.total = response.data.total
           }
         })
       },
@@ -312,7 +361,7 @@
           area: this.form.area,
           period: this.form.period,
           good: this.form.good,
-          avatar: '',
+          avatar: this.imageUrl,
           case: this.form.caseDetail,
           path: this.form.path,
           detail: this.form.detail

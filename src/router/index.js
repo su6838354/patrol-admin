@@ -43,7 +43,7 @@ export const constantRouterMap = [
   {
     path: '/helper',
     component: Layout,
-    redirect: '/cbo_order/index',
+    redirect: '/helper/type=help',
     name: '',
     meta: { title: '人员信息', icon: 'documentation', noCache: true },
     children: [{

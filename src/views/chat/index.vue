@@ -60,7 +60,7 @@ export default {
     }
   },
   created() {
-    const manager = io.Manager('http://127.0.0.1:3333',
+    const manager = io.Manager('http://139.196.243.147:3333',
       {
         reconnectionAttempts: 100,
         reconnectionDelay: 4000,
@@ -198,6 +198,7 @@ export default {
   padding-bottom: 20px;
   /* height: 600px; */
   position: absolute;
+  /*position: fixed;*/
   overflow: scroll;
   width: 700px;
   bottom: 100px;
@@ -216,7 +217,8 @@ export default {
   justify-content: center;
   align-items: center;
   height: 75px;
-  position: absolute;
+  position: fixed;
+  /*position: absolute;*/
   bottom: 30px;
 }
 

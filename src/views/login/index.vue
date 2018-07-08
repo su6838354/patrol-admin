@@ -98,7 +98,7 @@ export default {
           this.loading = true
           this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
             this.loading = false
-            this.$router.push({ path: '/cbo_order/index/type=help' })
+            this.$router.push({ path: '/helper/type=help' })
           }).catch(() => {
             this.loading = false
           })

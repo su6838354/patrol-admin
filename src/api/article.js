@@ -49,9 +49,12 @@ export function fetchCboOrder(query) {
   })
 }
 
+let url = 'http://127.0.0.1:7001'
+url = 'http://security.weichongming.com'
+
 export function fetchHelper(data) {
   return request({
-    url: 'http://security.weichongming.com/patrol/staff/list',
+    url: url + '/patrol/staff/list',
     method: 'post',
     data: data
   })
