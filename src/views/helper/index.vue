@@ -64,9 +64,29 @@
         </template>
       </el-table-column>
 
+      <el-table-column label="状态" align="center">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === 'offline'" type="info">下线</el-tag>
+          <el-tag v-if="scope.row.status === 'online'" type="success">上线</el-tag>
+        </template>
+      </el-table-column>
+
       <el-table-column label="处理" align="center">
         <template slot-scope="scope">
           <el-button type="primary" @click="updateRole('update',scope.row)">修改</el-button>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="上下线切换" align="center">
+        <template slot-scope="scope">
+          <el-button v-if="scope.row.status === 'offline'" type="success" @click="updateRole('online',scope.row)">上线</el-button>
+          <el-button v-if="scope.row.status === 'online'" type="info" @click="updateRole('offline',scope.row)">下线</el-button>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="删除" align="center">
+        <template slot-scope="scope">
+          <el-button type="error" @click="updateRole('delete',scope.row)">删除</el-button>
         </template>
       </el-table-column>
 
@@ -101,7 +121,11 @@
           {{scope.row.detail}}
         </template>
       </el-table-column>
+
       </div>
+
+
+
     </el-table>
 
     <el-dialog title="添加人员" :visible.sync="dialogFormVisible">
@@ -171,28 +195,28 @@
 <script>
   import { fetchHelper, fetchAddPeople, fetchUpdatePeople } from '../../api/article'
   import { parseTime } from '@/utils'
-  import upyun from 'upyun';
+  import upyun from 'upyun'
 
   function upload(file, cb) {
-    const path = '/sample-upload-' + file.name;
+    const path = '/sample-upload-' + file.name
     // client side only need bucket name
-    const bucket = new upyun.Bucket('sy-image-upyun');
+    const bucket = new upyun.Bucket('sy-image-upyun')
     function getHeaderSign(bucket, method) {
-      const params = 'bucket=' + bucket.bucketName + '&method=' + method + '&path=' + path;
+      const params = 'bucket=' + bucket.bucketName + '&method=' + method + '&path=' + path
       return fetch('http://security.weichongming.com/patrol/image/sign/head?' + params)
         .then(function(response) {
           if (response.status !== 200) {
-            console.error('gen header sign faild!');
-            return;
+            console.error('gen header sign faild!')
+            return
           }
           return response.json()
         })
     }
-    const client = new upyun.Client(bucket, getHeaderSign);
+    const client = new upyun.Client(bucket, getHeaderSign)
     client.putFile(path, file).then(function(result) {
-      const res = `http://ypy.weichongming.com${path}`;
-      cb({ code: result?0:-1, data: res });
-    });
+      const res = `http://ypy.weichongming.com${path}`
+      cb({ code: result ? 0 : -1, data: res })
+    })
   }
 
   export default {
@@ -230,7 +254,7 @@
         params: {
           name: ''
         },
-        total: 0,
+        total: 0
       }
     },
     created() {
@@ -242,19 +266,54 @@
         this.fetchData()
       },
       fileClick(e) {
-        const file = e.target.files[0];
-        this.$message.info('图片上传中...', 100000)
-        upload(file, ({code, data}) => {
-          if (code === 0)  {
+        const file = e.target.files[0]
+        this.$message.info('图片上传中...')
+        upload(file, ({ code, data }) => {
+          if (code === 0) {
             this.imageUrl = data
-            this.$message.success('图片上传成功', 1);
+            this.$message.success('图片上传成功')
           } else {
             this.$message.error('图片上传失败')
           }
         })
       },
       updateRole(param, row) {
+        if (param === 'offline' || param === 'online' || param === 'delete') {
+          const data = {}
+          if (param === 'delete') {
+            data.status = row.status
+            data.isDelete = 1
+          } else {
+            data.status = param
+          }
+          data.name = row.name
+          data.sex = row.sex.toString()
+          data.age = row.age
+          data.watch = row.watch
+          data.area = row.area
+          data.period = row.period
+          data.good = row.good
+          data.avatar = row.avatar
+          data.caseDetail = row.caseDetail
+          data.path = row.path
+          data.detail = row.detail
+          data.id = row.id
+
+          fetchUpdatePeople(data).then(response => {
+            if (response.data.code === 0) {
+              this.listLoading = false
+              this.dialogFormVisible = false
+              this.$message.success('操作成功!')
+              this.fetchData()
+            } else {
+              this.$message.error('操作失败!')
+            }
+          })
+          return
+        }
+
         if (param === 'update') {
+          this.form.status = row.status
           this.form.name = row.name
           this.form.sex = row.sex.toString()
           this.form.age = row.age
@@ -270,6 +329,7 @@
           this.id = row.id
         }
         if (param === 'add') {
+          this.form.status = 'online'
           this.form.name = ''
           this.form.sex = ''
           this.form.age = ''
@@ -301,7 +361,8 @@
           avatar: this.imageUrl,
           case: this.form.caseDetail,
           path: this.form.path,
-          detail: this.form.detail
+          detail: this.form.detail,
+          status: this.form.status
         }
         fetchUpdatePeople(data).then(response => {
           if (response.data.code === 0) {
@@ -334,7 +395,8 @@
         const data = {
           type: this.role,
           limit: this.pageSize,
-          offset: (this.currentPage - 1) * 10
+          offset: (this.currentPage - 1) * 10,
+          isDelete: 0
         }
         for (const item in this.params) {
           if (this.params[item]) {
@@ -355,7 +417,7 @@
           id: '',
           type: this.role,
           name: this.form.name,
-          sex: this.form.sex,
+          sex: parseInt(this.form.sex),
           age: this.form.age,
           watch: this.form.watch,
           area: this.form.area,
@@ -364,7 +426,8 @@
           avatar: this.imageUrl,
           case: this.form.caseDetail,
           path: this.form.path,
-          detail: this.form.detail
+          detail: this.form.detail,
+          status: this.form.status
         }
         fetchAddPeople(data).then(({ data: response }) => {
           if (response.code === 0) {

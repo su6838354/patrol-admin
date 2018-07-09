@@ -32,8 +32,7 @@
 <script>
 import { fetchCboOrder } from '@/api/article'
 import { parseTime } from '@/utils'
-import io from 'socket.io-client';
-
+import io from 'socket.io-client'
 
 export default {
   name: 'exportExcel',
@@ -65,12 +64,12 @@ export default {
         reconnectionAttempts: 100,
         reconnectionDelay: 4000,
         autoConnect: true
-      });
+      })
 
-    this.socket = manager.socket('/');
-    this.socket.emit('admin connect');
+    this.socket = manager.socket('/')
+    this.socket.emit('admin connect')
     this.socket.on('send message from user to admin', (data) => {
-      const username = data.username;
+      const username = data.username
       if (!this.users[username]) {
         this.users[username] = []
       }
@@ -78,7 +77,7 @@ export default {
       this.users = { ...this.users }
     })
   },
-  updated: function () {
+  updated: function() {
     window.document.querySelector('.container-1').scrollTop = window.document.querySelector('.container-1').scrollHeight
   },
   computed: {
@@ -86,7 +85,7 @@ export default {
       return this.users[this.current]
     },
     userList() {
-      return Object.keys(this.users);
+      return Object.keys(this.users)
     },
     getList() {
       return this.list.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
@@ -122,18 +121,18 @@ export default {
   },
   methods: {
     select(item) {
-      this.current = item;
+      this.current = item
     },
     sendMsg() {
       if (!this.current) {
         this.$message('请选择聊天对象')
       }
-      const msg = this.msg;
+      const msg = this.msg
       // if there is a non-empty message and a socket connection
       this.socket.emit('send message from admin', {
         username: this.current,
         msg: msg
-      });
+      })
       this.users[this.current].push({ from: 'admin', msg: this.msg })
       this.msg = ''
     },

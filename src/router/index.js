@@ -103,7 +103,7 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/chat/index',
     children: [{ path: 'index', component: () => import('@/views/chat/index'), name: 'chat', meta: { title: '聊天' }}]
-  },
+  }
   // {
   //   path: '/documentation',
   //   component: Layout,
