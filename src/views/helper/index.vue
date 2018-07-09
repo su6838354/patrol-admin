@@ -190,7 +190,7 @@
     }
     const client = new upyun.Client(bucket, getHeaderSign);
     client.putFile(path, file).then(function(result) {
-      const res = `http://sy-image-upyun.test.upcdn.net/${path}`;
+      const res = `http://ypy.weichongming.com${path}`;
       cb({ code: result?0:-1, data: res });
     });
   }
