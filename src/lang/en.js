@@ -62,7 +62,7 @@ export default {
     theme: 'theme'
   },
   login: {
-    title: '崇明BUS',
+    title: '群防群治后台',
     logIn: 'Log in',
     username: 'Username',
     password: 'Password',
