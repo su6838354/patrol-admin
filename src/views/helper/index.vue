@@ -64,6 +64,37 @@
         </template>
       </el-table-column>
 
+
+      <el-table-column v-if="this.role === 'guard'" label="守护部位" align="center">
+        <template slot-scope="scope">
+          {{scope.row.watch}}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="this.role === 'guard'" label="管辖时间" width="315" align="center">
+        <template slot-scope="scope">
+          {{scope.row.period}}
+        </template>
+      </el-table-column>
+
+      <el-table-column v-if="this.role === 'guard'" label="路线规划" align="center">
+        <template slot-scope="scope">
+          {{scope.row.path}}
+        </template>
+      </el-table-column>
+
+
+      <el-table-column v-if="this.role === 'police'" label="线上接单数" align="center">
+        <template slot-scope="scope">
+          {{scope.row.info_count}}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="this.role === 'police'" label="警官简介" align="center">
+        <template slot-scope="scope">
+          {{scope.row.detail}}
+        </template>
+      </el-table-column>
+
+
       <el-table-column label="状态" align="center">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 'offline'" type="info">下线</el-tag>
@@ -89,43 +120,6 @@
           <el-button type="error" @click="updateRole('delete',scope.row)">删除</el-button>
         </template>
       </el-table-column>
-
-
-  <div v-if="this.role === 'guard'">
-    <el-table-column label="守护部位" align="center">
-      <template slot-scope="scope">
-        {{scope.row.watch}}
-      </template>
-    </el-table-column>
-      <el-table-column  label="管辖时间" width="315" align="center">
-        <template slot-scope="scope">
-          {{scope.row.period}}
-        </template>
-      </el-table-column>
-
-      <el-table-column label="路线规划" align="center">
-        <template slot-scope="scope">
-          {{scope.row.path}}
-        </template>
-      </el-table-column>
-
-  </div>
-      <div v-if="this.role === 'police'" >
-      <el-table-column label="线上接单数" align="center">
-        <template slot-scope="scope">
-          {{scope.row.info_count}}
-        </template>
-      </el-table-column>
-      <el-table-column label="警官简介" align="center">
-        <template slot-scope="scope">
-          {{scope.row.detail}}
-        </template>
-      </el-table-column>
-
-      </div>
-
-
-
     </el-table>
 
     <el-dialog title="添加人员" :visible.sync="dialogFormVisible">

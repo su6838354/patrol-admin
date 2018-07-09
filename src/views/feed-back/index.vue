@@ -43,13 +43,16 @@
       </el-table-column>
       <el-table-column label="状态"  align="center">
         <template slot-scope="scope">
-          {{statusShow(scope.row.status)}}
+
+          <el-tag v-if="scope.row.status === '' || scope.row.status === 'new'" type="danger">{{statusShow(scope.row.status)}}</el-tag>
+          <el-tag v-if="scope.row.status === 'accept'" type="success">{{statusShow(scope.row.status)}}</el-tag>
+          <el-tag v-if="scope.row.status === 'refuse'" type="error">{{statusShow(scope.row.status)}}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="操作"  align="center">
         <template slot-scope="scope">
           <el-button type="primary" v-if="scope.row.status === 'new' || scope.row.status === '' " @click="updateFeed(scope.row, 'accept')">接单</el-button>
-          <el-button type="warning" v-if="scope.row.status !== 'refuse'" @click="updateFeed(scope.row, 'refuse')">拒绝</el-button>
+          <el-button type="warning" v-if="scope.row.status === 'new' || scope.row.status === ''" @click="updateFeed(scope.row, 'refuse')">拒绝</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -61,7 +64,7 @@
       :page-sizes="[10, 20, 50, 100]"
       :page-size="pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400">
+      :total="total">
     </el-pagination>
   </div>
 </template>
@@ -86,7 +89,8 @@
         searchName: '',
         allPeople: [],
         statusArray: ['未处理', '已接单', '已拒绝'],
-        feedStatus: ''
+        feedStatus: '',
+        total: 0
       }
     },
     created() {
@@ -95,15 +99,7 @@
     },
     methods: {
       getStatus() {
-        this.list = this.allPeople
-        var searchList = []
-        this.list.forEach((e) => {
-          var statusText = this.statusShow(e.status)
-          if (statusText === this.feedStatus) {
-            searchList.push(e)
-          }
-        })
-        this.list = searchList
+        this.fetchData()
       },
       handleSizeChange(val) {
         this.pageSize = val
@@ -122,6 +118,18 @@
         if (status === 'refuse') {
           return '已拒绝'
         }
+        return '待处理'
+      },
+      statusShow1(status) {
+        if (status === '待处理') {
+          return 'new'
+        }
+        if (status === '已接单') {
+          return 'accept'
+        }
+        if (status === '已拒绝') {
+          return 'refuse'
+        }
         return ''
       },
       fetchData() {
@@ -131,11 +139,15 @@
           limit: this.pageSize,
           offset: (this.currentPage - 1) * 10
         }
+        if (this.feedStatus) {
+          data['status'] = this.statusShow1(this.feedStatus)
+        }
         fetchFeedBack(data).then(response => {
           if (response.data.code === 0) {
             this.list = response.data.data
             this.allPeople = response.data.data
             this.listLoading = false
+            this.total = response.data.total
           }
         })
       },
