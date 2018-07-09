@@ -74,12 +74,12 @@
   <div v-if="this.role === 'guard'">
     <el-table-column label="守护部位" align="center">
       <template slot-scope="scope">
-        {{scope.row.path}}
+        {{scope.row.watch}}
       </template>
     </el-table-column>
       <el-table-column  label="管辖时间" width="315" align="center">
         <template slot-scope="scope">
-          {{scope.row.area}}
+          {{scope.row.period}}
         </template>
       </el-table-column>
 
