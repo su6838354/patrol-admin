@@ -2,9 +2,9 @@
   <!-- $t is vue-i18n global function to translate lang -->
   <div class="app-container">
 
-    <label class="radio-label" style="padding-left:0;">Filename: </label>
-    <el-input style='width:340px;' :placeholder="$t('excel.placeholder')" prefix-icon="el-icon-document" v-model="filename"></el-input>
-    <el-button style='margin:0 0 20px 20px;' type="primary" icon="document" @click="handleDownload" :loading="downloadLoading">{{$t('excel.export')}} excel</el-button>
+    <!--<label class="radio-label" style="padding-left:0;">Filename: </label>-->
+    <!--<el-input style='width:340px;' :placeholder="$t('excel.placeholder')" prefix-icon="el-icon-document" v-model="filename"></el-input>-->
+    <!--<el-button style='margin:0 0 20px 20px;' type="primary" icon="document" @click="handleDownload" :loading="downloadLoading">{{$t('excel.export')}} excel</el-button>-->
     <div class="filter-container">
       <!--<el-select clearable style="width: 200px" class="filter-item" v-model="query.order_path" :placeholder="'线路'">-->
         <!--<el-option v-for="item in getPath" :key="item" :label="item" :value="item">-->
@@ -148,17 +148,17 @@
         </el-form-item>
 
         <el-form-item  v-if="this.role === 'guard'" label="路线规划" :label-width="formLabelWidth">
-          <el-input type="textarea" v-model="form.path"></el-input>
+          <el-input type="textarea" :rows="6" v-model="form.path"></el-input>
         </el-form-item>
         <el-form-item label="擅长" v-if="this.role !== 'guard'" :label-width="formLabelWidth">
-          <el-input type="textarea"  v-model="form.good" auto-complete="off"></el-input>
+          <el-input type="textarea" :rows="6"  v-model="form.good" auto-complete="off"></el-input>
         </el-form-item>
 
         <el-form-item label="案件处理" v-if ="this.role === 'mediation'" :label-width="formLabelWidth" >
-          <el-input type="textarea" v-model="form.caseDetail"></el-input>
+          <el-input type="textarea" :rows="6" v-model="form.caseDetail"></el-input>
         </el-form-item>
         <el-form-item label="警官简介" v-if ="this.role === 'police'" :label-width="formLabelWidth">
-          <el-input type="textarea" v-model="form.detail" ></el-input>
+          <el-input type="textarea" :rows="6" v-model="form.detail" ></el-input>
         </el-form-item>
 
         <el-form-item label="头像" :label-width="formLabelWidth">

@@ -2,9 +2,9 @@
   <!-- $t is vue-i18n global function to translate lang -->
   <div class="app-container">
 
-    <label class="radio-label" style="padding-left:0;">Filename: </label>
-    <el-input style='width:340px;' :placeholder="$t('excel.placeholder')" prefix-icon="el-icon-document" v-model="filename"></el-input>
-    <el-button style='margin:0 0 20px 20px;' type="primary" icon="document" @click="handleDownload" :loading="downloadLoading">{{$t('excel.export')}} excel</el-button>
+    <!--<label class="radio-label" style="padding-left:0;">Filename: </label>-->
+    <!--<el-input style='width:340px;' :placeholder="$t('excel.placeholder')" prefix-icon="el-icon-document" v-model="filename"></el-input>-->
+    <!--<el-button style='margin:0 0 20px 20px;' type="primary" icon="document" @click="handleDownload" :loading="downloadLoading">{{$t('excel.export')}} excel</el-button>-->
     <div class="filter-container">
       <el-select clearable style="width: 200px" class="filter-item" v-model="feedStatus" :placeholder="'处理状态'">
         <el-option v-for="(item, index) in statusArray" :key="index" :label="item" :value="item">
@@ -41,6 +41,24 @@
           <img width= '90' height='60' :src="scope.row.image_url"/>
         </template>
       </el-table-column>
+
+      <el-table-column v-if="this.type === 'yuyue'" label="预约民警"  align="center">
+        <template slot-scope="scope" v-if="scope.row.police">
+          <el-popover
+            width="210"
+            title="预计民警简介"
+            trigger="hover">
+            <div>
+              <div>ID：{{scope.row.police.id}}</div>
+              <div>姓名：{{scope.row.police.name}}</div>
+              <div><img width="200" height="200" :src="scope.row.police.avatar"/></div>
+            </div>
+            <el-button slot="reference"><a>{{scope.row.police && scope.row.police.name}}</a></el-button>
+          </el-popover>
+
+        </template>
+      </el-table-column>
+
       <el-table-column label="状态"  align="center">
         <template slot-scope="scope">
 
@@ -88,7 +106,7 @@
         autoWidth: true,
         searchName: '',
         allPeople: [],
-        statusArray: ['未处理', '已接单', '已拒绝'],
+        statusArray: ['待处理', '已接单', '已拒绝'],
         feedStatus: '',
         total: 0
       }

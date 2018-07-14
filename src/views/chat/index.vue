@@ -6,10 +6,16 @@
       <el-aside width="300px">
         <div  v-for="item in userList">
           <el-button @click="select(item)" type="text" >{{item}}</el-button>
+
+          <el-tag v-if="users[item].online === true" type="success">在线</el-tag>
+          <el-tag v-if="users[item].online === false" type="info">离线</el-tag>
+          <el-tag v-if="newMessage[item]" type="danger">新消息:{{ newMessage[item] }}</el-tag>
+
         </div>
       </el-aside>
       <el-main >
         <el-tag v-if="current">{{ current }}</el-tag>
+        <el-tag type="info" v-if="!current">请选择沟通对象</el-tag>
 
         <div class="chat-1">
           <div class="container-1">
@@ -17,7 +23,7 @@
           </div>
 
           <div class='input-1'>
-            <input  v-model="msg" placeholder="请输入" />
+            <input class="input-send-msg"  v-model="msg" placeholder="请输入" />
             <el-button type="primary" @click="sendMsg" round>发送</el-button>
             </div>
           </div>
@@ -54,26 +60,50 @@ export default {
       },
       users: {
       },
+      newMessage: {},
       msg: '',
       current: ''
     }
   },
+  mounted() {
+    document.querySelector('.input-send-msg').addEventListener('keyup', (e) => {
+      if (e.keyCode === 13) {
+        this.sendMsg()
+      }
+    })
+  },
   created() {
-    const manager = io.Manager('http://139.196.243.147:3333',
+    const manager = io.Manager(
+      'http://139.196.243.147:3333',
+//      'http://127.0.0.1:3333',
       {
+        query: { username: 'admin' },
         reconnectionAttempts: 100,
         reconnectionDelay: 4000,
         autoConnect: true
       })
 
     this.socket = manager.socket('/')
+    this.socket.on('init', (messages) => {
+      console.log(messages)
+      this.users = messages
+    })
     this.socket.emit('admin connect')
     this.socket.on('send message from user to admin', (data) => {
       const username = data.username
       if (!this.users[username]) {
-        this.users[username] = []
+        this.users[username] = {
+          online: true,
+          msgs: []
+        }
       }
-      this.users[username].push({ from: 'me', msg: data.msg })
+      this.users[username].msgs.push({ from: 'me', msg: data.msg })
+      if (this.newMessage[username]) {
+        this.newMessage[username] = this.newMessage[username] + 1
+      } else {
+        this.newMessage[username] = 1
+      }
+
       this.users = { ...this.users }
     })
   },
@@ -82,7 +112,7 @@ export default {
   },
   computed: {
     msgs() {
-      return this.users[this.current]
+      return this.users[this.current] && this.users[this.current].msgs
     },
     userList() {
       return Object.keys(this.users)
@@ -122,18 +152,24 @@ export default {
   methods: {
     select(item) {
       this.current = item
+      this.newMessage[item] = 0
     },
     sendMsg() {
+      if (!this.msg) {
+        return
+      }
       if (!this.current) {
         this.$message('请选择聊天对象')
+        return
       }
       const msg = this.msg
       // if there is a non-empty message and a socket connection
       this.socket.emit('send message from admin', {
         username: this.current,
-        msg: msg
+        msg: msg,
+        from: 'admin',
       })
-      this.users[this.current].push({ from: 'admin', msg: this.msg })
+      this.users[this.current].msgs.push({ from: 'admin', msg: this.msg })
       this.msg = ''
     },
     handleSizeChange(val) {
