@@ -111,6 +111,12 @@ export const constantRouterMap = [
     children: [{ path: 'index', component: () => import('@/views/chat/index'), name: 'chat', meta: { title: '聊天' }}]
   },
   {
+    path: '/map-d',
+    component: Layout,
+    redirect: '/map-d/index',
+    children: [{ path: 'index', component: () => import('@/views/map/index-ding'), name: 'map-d', meta: { title: '实时定位' }}]
+  },
+  {
     path: '/map',
     component: Layout,
     redirect: '/map/index',

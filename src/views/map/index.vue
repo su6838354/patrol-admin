@@ -107,7 +107,7 @@ export default {
     fetchHelper(data).then(response => {
       if (response.data.code === 0) {
         this.xunluoList = response.data.data
-        this.getRealTimePoints();
+//        this.getRealTimePoints();
       }
     });
   },
@@ -156,7 +156,7 @@ export default {
               var size = new BMap.Size(30, 30);
               var offset = new BMap.Size(0, -15);
               var imageSize = new BMap.Size(30, 30);
-              var icon = new BMap.Icon('https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80', size, {
+              var icon = new BMap.Icon('http://ypy.weichongming.com/sample-upload-1531761060838.jpg', size, {
                 imageSize: imageSize
               });
               const Bp = new BMap.Point(point.lng, point.lat)
@@ -202,8 +202,9 @@ export default {
     draw(pointArr) {
       var map = new BMap.Map("baiduMap");
       this.map = map;
-      var point = new BMap.Point(116.404, 39.915);
-      map.centerAndZoom(point, 15);
+
+      var point = new BMap.Point(121.51837, 31.146772)
+      map.centerAndZoom(point, 10);
       map.enableScrollWheelZoom(); // 开启鼠标滚轮缩放
       map.addControl(new BMap.ScaleControl()); // 添加比例尺控件
 
@@ -249,7 +250,7 @@ export default {
       var size = new BMap.Size(13, 13);
       var offset = new BMap.Size(0, -7);
       var imageSize = new BMap.Size(13, 13);
-      var icon = new BMap.Icon('http://qyadmin.weichongming.com/logo.png', size, {
+      var icon = new BMap.Icon('http://ypy.weichongming.com/sample-upload-1531761060838.jpg', size, {
         imageSize: imageSize
       });
 
@@ -298,7 +299,7 @@ export default {
           map.centerAndZoom(new BMap.Point(cenLng, cenLat), zoom);
         } else {
           //没有坐标，显示全中国
-          map.centerAndZoom(new BMap.Point(103.388611, 35.563611), 5);
+          map.centerAndZoom(new BMap.Point(121.51837, 31.146772), 5);
         }
       }
 
