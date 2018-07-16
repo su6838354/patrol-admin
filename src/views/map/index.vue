@@ -39,25 +39,25 @@ export default {
     const start = new Date();
     start.setTime(start.getTime() - 3600 * 1000 * 24 * 1);
     return {
-      staff: 'A',
+      staff: '12150828',
       staffs: {
-        A: {
+        '12150828': {
           "vhcid": "12150828",
           "vehicle": "9035",
         },
-        B: {
-          "vhcid": "12150828",
+        '12150835': {
+          "vhcid": "12150835",
           "vehicle": "9035",
         }
       },
       options: [
         {
-          value: '',
-          label: 'A'
+          value: '12150828',
+          label: '12150828'
         },
         {
-          value: 'B',
-          label: 'B'
+          value: '12150835',
+          label: '12150835'
         }
       ],
       pickerOptions2: {
