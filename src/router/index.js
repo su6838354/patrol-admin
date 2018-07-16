@@ -69,6 +69,12 @@ export const constantRouterMap = [
       component: () => import('@/views/helper/index'),
       name: 'police',
       meta: { title: '民警', icon: 'documentation', noCache: true }
+    },
+    {
+      path: 'type=xunluo',
+      component: () => import('@/views/helper/index'),
+      name: 'xunluo',
+      meta: { title: '巡逻员', icon: 'documentation', noCache: true }
     }
     ]
   },

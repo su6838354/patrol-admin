@@ -1,23 +1,19 @@
 <template>
   <div>
     <div class="filter-container">
-      <!--<el-date-picker-->
-        <!--v-model="value5"-->
-        <!--type="datetimerange"-->
-        <!--:picker-options="pickerOptions2"-->
-        <!--range-separator="至"-->
-        <!--start-placeholder="开始日期"-->
-        <!--end-placeholder="结束日期"-->
-        <!--align="right">-->
-      <!--</el-date-picker>-->
+      <el-date-picker
+        v-model="value1"
+        type="date"
+        placeholder="选择日期">
+      </el-date-picker>
 
-      <el-tag>前一天轨迹</el-tag>
-      <el-select v-model="staff" placeholder="请选择">
+      <!--<el-tag>前一天轨迹</el-tag>-->
+      <el-select v-model="xunluoId" placeholder="请选择">
         <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
+          v-for="item in xunluoList"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id">
         </el-option>
       </el-select>
       <el-button @click="getPoints" type="primary">查询</el-button>
@@ -30,6 +26,8 @@
 <script>
   import { getPoints } from '../../api/article'
   import moment from 'moment'
+  import { fetchHelper } from '../../api/article'
+  import request from 'request'
 
 export default {
   name: 'exportExcel',
@@ -39,6 +37,10 @@ export default {
     const start = new Date();
     start.setTime(start.getTime() - 3600 * 1000 * 24 * 1);
     return {
+      value1: start,
+      vehicles: [],
+      xunluoList: [],
+      xunluoId: '',
       staff: '12150828',
       staffs: {
         '12150828': {
@@ -47,7 +49,7 @@ export default {
         },
         '12150835': {
           "vhcid": "12150835",
-          "vehicle": "9035",
+          "vehicle": "2153",
         }
       },
       options: [
@@ -62,30 +64,32 @@ export default {
       ],
       pickerOptions2: {
         shortcuts: [{
-          text: '最近一周',
+          text: '最近一天',
           onClick(picker) {
             const end = new Date();
             const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 1);
             picker.$emit('pick', [start, end]);
           }
-        }, {
-          text: '最近一个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近三个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-            picker.$emit('pick', [start, end]);
-          }
-        }]
+        },
+//        {
+//          text: '最近一个月',
+//          onClick(picker) {
+//            const end = new Date();
+//            const start = new Date();
+//            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+//            picker.$emit('pick', [start, end]);
+//          }
+//        }, {
+//          text: '最近三个月',
+//          onClick(picker) {
+//            const end = new Date();
+//            const start = new Date();
+//            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+//            picker.$emit('pick', [start, end]);
+//          }
+//        }
+        ]
       },
       value5: [start, end]
     }
@@ -94,9 +98,22 @@ export default {
     const recaptchaScript = document.createElement('script')
     recaptchaScript.setAttribute('src', 'http://api.map.baidu.com/api?v=2.0&ak=KUF6d1NBvRFgrZ6q3GLOs7oK1N6aR32K')
     document.head.appendChild(recaptchaScript)
+    const data = {
+      type: 'xunluo',
+      limit: 100,
+      offset: 0,
+      isDelete: 0
+    }
+    fetchHelper(data).then(response => {
+      if (response.data.code === 0) {
+        this.xunluoList = response.data.data
+        this.getRealTimePoints();
+      }
+    });
   },
   mounted () {
     this.getPoints();
+    this.draw()
   },
   computed: {
     msgs() {
@@ -104,14 +121,78 @@ export default {
     }
   },
   methods: {
+    getRealTimePoints() {
+      request.post('http://121.40.98.157:89/gpsonline/GPSAPI', {form: {
+        version: 1,
+        method: 'loadVehicles',
+        uid: '2435577',
+        uKey: '41a21112614ad3f3f748a5e43c272d5f'
+      }}, (err, rep) => {
+        this.vehicles = JSON.parse(rep.body).groups[0].vehicles;
+      });
+      setInterval(() => {
+        this._getRealTimePoints()
+      }, 4000);
+    },
+    _getRealTimePoints(vKey) {
+      this.xunluoList.map(item => {
+        const v = this.vehicles.filter(item2 => item2.name == item.area)[0]
+        if (v) {
+          request.post('http://121.40.98.157:89/gpsonline/GPSAPI', {form: {
+            version: 1,
+            method: 'loadLocation',
+            vid: item.watch, //'12150835',
+            vKey: v.vKey,//'4660f3bd748c4a365d47411143f2343e'
+          }}, (err, rep) => {
+            const body = JSON.parse(rep.body);
+            if (body.success) {
+              const lngDiff = 0.010988
+              const latDiff = 0.003575
+              const point = {
+                lat: body.locs[0].lat + latDiff,
+                lng: body.locs[0].lng + lngDiff
+              }
+              // 配置图片
+              var size = new BMap.Size(30, 30);
+              var offset = new BMap.Size(0, -15);
+              var imageSize = new BMap.Size(30, 30);
+              var icon = new BMap.Icon('https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80', size, {
+                imageSize: imageSize
+              });
+              const Bp = new BMap.Point(point.lng, point.lat)
+              var marker = new BMap.Marker(Bp, {
+                icon: icon,
+                offset: offset
+              }); // 创建标注
+              this.map.addOverlay(marker);
+              var infoWindow = new BMap.InfoWindow(`${item.name}`);
+              marker.addEventListener("click", function(){
+                this.openInfoWindow(infoWindow);
+              });
+
+              if (!this.first) {
+                this.first = true
+                this.map.centerAndZoom(Bp, 15);
+              }
+            }
+          });
+        }
+
+      })
+
+    },
     getPoints() {
-      const start = moment().subtract(1, 'days').format('YYYY-MM-DD 00:00:00');// moment(this.value5[0] || (new Date())).format('YYYY-MM-DD HH:mm:ss')
-      const end = moment().subtract(1, 'days').format('YYYY-MM-DD 23:59:59'); // moment(this.value5[1] || (new Date())).format('YYYY-MM-DD HH:mm:ss')
-      const p = this.staffs[this.staff]
+      // moment().subtract(1, 'days').format('YYYY-MM-DD 00:00:00');//
+      // moment().subtract(1, 'days').format('YYYY-MM-DD 23:59:59'); //
+      if (!this.xunluoId) {
+        return
+      }
+      const start = moment(this.value1 || (new Date())).format('YYYY-MM-DD 00:00:00')
+      const end =  moment(this.value1 || (new Date())).format('YYYY-MM-DD 23:59:59')
+      const p = this.xunluoList.filter(item => item.id == this.xunluoId)[0]
       getPoints({
-        ...p,
-//        "vhcid": "12150828",
-//        "vehicle": "9035",
+        "vhcid": p.watch,
+        "vehicle": p.area,
         "begin_time": start,
         "end_time": end, //"2018-07-15 23:59:59"
       }).then((rep) => {
@@ -120,6 +201,7 @@ export default {
     },
     draw(pointArr) {
       var map = new BMap.Map("baiduMap");
+      this.map = map;
       var point = new BMap.Point(116.404, 39.915);
       map.centerAndZoom(point, 15);
       map.enableScrollWheelZoom(); // 开启鼠标滚轮缩放
@@ -164,9 +246,9 @@ export default {
       map.addOverlay(polyline);
 
       // 配置图片
-      var size = new BMap.Size(26, 26);
-      var offset = new BMap.Size(0, -13);
-      var imageSize = new BMap.Size(26, 26);
+      var size = new BMap.Size(13, 13);
+      var offset = new BMap.Size(0, -7);
+      var imageSize = new BMap.Size(13, 13);
       var icon = new BMap.Icon('http://qyadmin.weichongming.com/logo.png', size, {
         imageSize: imageSize
       });
@@ -178,6 +260,7 @@ export default {
           offset: offset
         }); // 创建标注
         map.addOverlay(marker);
+
 
       }
 

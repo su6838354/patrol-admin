@@ -45,13 +45,25 @@
         </template>
       </el-table-column>
 
-      <el-table-column  label="管辖区域"  v-if="this.role !== 'guard'" align="center">
+      <el-table-column  label="管辖区域"  v-if="this.role !== 'guard' && this.role !== 'xunluo'" align="center">
         <template slot-scope="scope">
           {{scope.row.area}}
         </template>
       </el-table-column>
 
-      <el-table-column label="擅长" v-if="this.role !== 'guard'" align="center">
+      <el-table-column  label="对讲机编号"  v-if="this.role === 'xunluo'" align="center">
+        <template slot-scope="scope">
+          {{scope.row.area}}
+        </template>
+      </el-table-column>
+
+      <el-table-column  label="设备ID"  v-if="this.role === 'xunluo'" align="center">
+        <template slot-scope="scope">
+          {{scope.row.watch}}
+        </template>
+      </el-table-column>
+
+      <el-table-column label="擅长" v-if="this.role !== 'guard' && this.role !== 'xunluo'" align="center">
         <template slot-scope="scope">
           {{scope.row.good}}
         </template>
@@ -95,7 +107,7 @@
       </el-table-column>
 
 
-      <el-table-column label="状态" align="center">
+      <el-table-column v-if="this.role !== 'xunluo'" label="状态" align="center">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 'offline'" type="info">下线</el-tag>
           <el-tag v-if="scope.row.status === 'online'" type="success">上线</el-tag>
@@ -108,7 +120,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="上下线切换" align="center">
+      <el-table-column v-if="this.role !== 'xunluo'" label="上下线切换" align="center">
         <template slot-scope="scope">
           <el-button v-if="scope.row.status === 'offline'" type="success" @click="updateRole('online',scope.row)">上线</el-button>
           <el-button v-if="scope.row.status === 'online'" type="info" @click="updateRole('offline',scope.row)">下线</el-button>
@@ -136,9 +148,18 @@
         <el-form-item label="年龄" :label-width="formLabelWidth">
           <el-input v-model="form.age" auto-complete="off" type="number" :min="10" :max="120"></el-input>
         </el-form-item>
-        <el-form-item label="管辖区域" v-if="this.role !== 'guard'" :label-width="formLabelWidth">
+        <el-form-item label="管辖区域" v-if="this.role !== 'guard' && this.role !== 'xunluo'" :label-width="formLabelWidth">
           <el-input v-model="form.area" auto-complete="off"></el-input>
         </el-form-item>
+
+        <el-form-item label="对讲机编号" v-if="this.role === 'xunluo'" :label-width="formLabelWidth">
+          <el-input v-model="form.area" auto-complete="off"></el-input>
+        </el-form-item>
+
+        <el-form-item label="设备ID" v-if="this.role === 'xunluo'" :label-width="formLabelWidth">
+          <el-input v-model="form.watch" auto-complete="off"></el-input>
+        </el-form-item>
+
         <el-form-item  v-if="this.role === 'guard'" label="守护部位" :label-width="formLabelWidth">
           <el-input v-model="form.watch" auto-complete="off"></el-input>
         </el-form-item>
@@ -150,7 +171,7 @@
         <el-form-item  v-if="this.role === 'guard'" label="路线规划" :label-width="formLabelWidth">
           <el-input type="textarea" :rows="6" v-model="form.path"></el-input>
         </el-form-item>
-        <el-form-item label="擅长" v-if="this.role !== 'guard'" :label-width="formLabelWidth">
+        <el-form-item label="擅长" v-if="this.role !== 'guard' && this.role !== 'xunluo'" :label-width="formLabelWidth">
           <el-input type="textarea" :rows="6"  v-model="form.good" auto-complete="off"></el-input>
         </el-form-item>
 
@@ -243,7 +264,7 @@
           path: '',
           detail: ''
         },
-        formLabelWidth: '10%',
+        formLabelWidth: '30%',
         dialogFormVisible: false,
         params: {
           name: ''

@@ -90,6 +90,7 @@ export function updateFeedBack(data) {
 
 export function getPoints(data) {
   return request({
+    // url: 'http://127.0.0.1:7001/patrol/get_points',
     url: 'http://security.weichongming.com/patrol/get_points',
     method: 'post',
     data: data
