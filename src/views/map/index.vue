@@ -1,62 +1,102 @@
 <template>
-  <div class="map-parent">
-    <iframe src="http://dj.vvv1vvv.com/mapmanagement/-1/-1" width="100%" id="map" onload="console.log('----', this.contentWindow.getElementById('name'))" ></iframe>
+  <div>
+    <div class="filter-container">
+      <!--<el-date-picker-->
+        <!--v-model="value5"-->
+        <!--type="datetimerange"-->
+        <!--:picker-options="pickerOptions2"-->
+        <!--range-separator="至"-->
+        <!--start-placeholder="开始日期"-->
+        <!--end-placeholder="结束日期"-->
+        <!--align="right">-->
+      <!--</el-date-picker>-->
+
+      <el-tag>前一天轨迹</el-tag>
+      <el-select v-model="staff" placeholder="请选择">
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
+      <el-button @click="getPoints" type="primary">查询</el-button>
+    </div>
+    <div id="baiduMap" style="height: 1000px;"></div>
   </div>
-  <!--<div id="allmap">-->
-    <!---->
-  <!--</div>-->
+
 </template>
 
 <script>
-//import request from '@/utils/request'
-import request from 'request';
-
+  import { getPoints } from '../../api/article'
+  import moment from 'moment'
 
 export default {
   name: 'exportExcel',
   data() {
+
+    const end = new Date();
+    const start = new Date();
+    start.setTime(start.getTime() - 3600 * 1000 * 24 * 1);
     return {
-      loginInfo: {}
+      staff: 'A',
+      staffs: {
+        A: {
+          "vhcid": "12150828",
+          "vehicle": "9035",
+        },
+        B: {
+          "vhcid": "12150828",
+          "vehicle": "9035",
+        }
+      },
+      options: [
+        {
+          value: '',
+          label: 'A'
+        },
+        {
+          value: 'B',
+          label: 'B'
+        }
+      ],
+      pickerOptions2: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+            picker.$emit('pick', [start, end]);
+          }
+        }]
+      },
+      value5: [start, end]
     }
   },
-  mounted() {
-    document.getElementById('map').addEventListener('onload', () => {
-
-    })
-//    this.drawPoints()
-//    this.drawPath()
-  },
   created() {
-//    request.post('http://121.40.98.157:89/gpsonline/GPSAPI', {form: {
-//      version: 1,
-//      method: 'loginSystem',
-//      name: '上海杰闳',
-//      pwd: '123456'
-//    }}, (err, rep) => {
-//      console.log(rep.body)
-//    });
-//
-//    request.post('http://121.40.98.157:89/gpsonline/GPSAPI', {form: {
-//      version: 1,
-//      method: 'loadVehicles',
-//      uid: '2435577',
-//      uKey: '41a21112614ad3f3f748a5e43c272d5f'
-//    }}, (err, rep) => {
-//      console.log(rep.body)
-//    });
-//
-//    request.post('http://121.40.98.157:89/gpsonline/GPSAPI', {form: {
-//      version: 1,
-//      method: 'loadLocation',
-//      vid: '12150835',
-//      vKey: '4660f3bd748c4a365d47411143f2343e'
-//    }}, (err, rep) => {
-//      console.log(rep.body)
-//    });
-
+    const recaptchaScript = document.createElement('script')
+    recaptchaScript.setAttribute('src', 'http://api.map.baidu.com/api?v=2.0&ak=KUF6d1NBvRFgrZ6q3GLOs7oK1N6aR32K')
+    document.head.appendChild(recaptchaScript)
   },
-  updated: function() {
-    window.document.querySelector('.container-1').scrollTop = window.document.querySelector('.container-1').scrollHeight
+  mounted () {
+    this.getPoints();
   },
   computed: {
     msgs() {
@@ -64,149 +104,122 @@ export default {
     }
   },
   methods: {
-
-    drawPoints() {
-      // 百度地图API功能
-      const map = new BMap.Map("allmap");
-      map.centerAndZoom(new BMap.Point(116.417854,39.921988), 15);
-
-      var data_info = [[116.417854,39.921988,"地址：北京市东城区王府井大街88号乐天银泰百货八层"],
-        [116.406605,39.921585,"地址：北京市东城区东华门大街"],
-        [116.412222,39.912345,"地址：北京市东城区正义路甲5号"]
-      ];
-      var opts = {
-        width : 250,     // 信息窗口宽度
-        height: 80,     // 信息窗口高度
-        title : "信息窗口" , // 信息窗口标题
-        enableMessage:true//设置允许信息窗发送短息
-      };
-      for(var i=0;i<data_info.length;i++){
-        var marker = new BMap.Marker(new BMap.Point(data_info[i][0],data_info[i][1]));  // 创建标注
-        var content = data_info[i][2];
-        map.addOverlay(marker);               // 将标注添加到地图中
-        addClickHandler(content,marker);
-      }
-      function addClickHandler(content,marker){
-        marker.addEventListener("click",function(e){
-          openInfo(content,e)}
-        );
-      }
-      function openInfo(content,e){
-        var p = e.target;
-        var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
-        var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象
-        map.openInfoWindow(infoWindow,point); //开启信息窗口
-      }
+    getPoints() {
+      const start = moment().subtract(1, 'days').format('YYYY-MM-DD 00:00:00');// moment(this.value5[0] || (new Date())).format('YYYY-MM-DD HH:mm:ss')
+      const end = moment().subtract(1, 'days').format('YYYY-MM-DD 23:59:59'); // moment(this.value5[1] || (new Date())).format('YYYY-MM-DD HH:mm:ss')
+      const p = this.staffs[this.staff]
+      getPoints({
+        ...p,
+//        "vhcid": "12150828",
+//        "vehicle": "9035",
+        "begin_time": start,
+        "end_time": end, //"2018-07-15 23:59:59"
+      }).then((rep) => {
+        this.draw(rep.data.topics)
+      })
     },
-    drawPath() {
-      // 百度地图API功能
-      var map = new BMap.Map("allmap");
-      map.centerAndZoom(new BMap.Point(116.404, 39.915), 15);
-      var bounds = null;
-      var linesPoints = null;
-      var spoi1 = new BMap.Point(116.380967,39.913285);    // 起点1
-      var spoi2 = new BMap.Point(116.380967,39.953285);    // 起点2
-      var epoi  = new BMap.Point(116.424374,39.914668);    // 终点
-      var myIcon = new BMap.Icon("http://lbsyun.baidu.com/jsdemo/img/Mario.png", new BMap.Size(32, 70), {imageOffset: new BMap.Size(0, 0)});
-      function initLine(){
-        bounds = new Array();
-        linesPoints = new Array();
-        map.clearOverlays();                                                    // 清空覆盖物
-        var driving3 = new BMap.DrivingRoute(map,{onSearchComplete:drawLine});  // 驾车实例,并设置回调
-        driving3.search(spoi1, epoi);                                       // 搜索一条线路
-        var driving4 = new BMap.DrivingRoute(map,{onSearchComplete:drawLine});  // 驾车实例,并设置回调
-        driving4.search(spoi2, epoi);                                       // 搜索一条线路
-      }
-      function run(){
-        for(var m = 0;m < linesPoints.length; m++){
-          var pts = linesPoints[m];
-          var len = pts.length;
-          var carMk = new BMap.Marker(pts[0],{icon:myIcon});
-          map.addOverlay(carMk);
-          resetMkPoint(1,len,pts,carMk)
-        }
+    draw(pointArr) {
+      var map = new BMap.Map("baiduMap");
+      var point = new BMap.Point(116.404, 39.915);
+      map.centerAndZoom(point, 15);
+      map.enableScrollWheelZoom(); // 开启鼠标滚轮缩放
+      map.addControl(new BMap.ScaleControl()); // 添加比例尺控件
 
-        function resetMkPoint(i,len,pts,carMk){
-          carMk.setPosition(pts[i]);
-          if(i < len){
-            setTimeout(function(){
-              i++;
-              resetMkPoint(i,len,pts,carMk);
-            },100);
-          }
+      const lngDiff = 0.010988
+      const latDiff = 0.003575
+      pointArr = pointArr.map(item => {
+        return {
+          lat: latDiff + item.lat,
+          lng: lngDiff + item.lng
         }
+      })
+
+//      var pointArr = [
+//        {"lat":latDiff+31.146997451782227,"lng":lngDiff+121.51802062988281},
+//        {"lat":latDiff+31.146934509277344,"lng":lngDiff+121.51838684082031},
+//        {"lat":latDiff+31.146934509277344,"lng":lngDiff+121.51838684082031},
+//        {"lat":latDiff+31.146930694580078,"lng":lngDiff+121.5184555053711},
+//        {"lat":latDiff+31.146732330322266,"lng":lngDiff+121.51885986328125},
+//        {"lat":latDiff+31.14692497253418,"lng":lngDiff+121.51954650878906},
+//        {"lat":latDiff+31.146995544433594,"lng":lngDiff+121.51984405517578},
+//        {"lat":latDiff+31.146968841552734,"lng":lngDiff+121.51988983154297},
+//        {"lat":latDiff+31.146114349365234,"lng":lngDiff+121.5206069946289},
+//        {"lat":latDiff+31.145870208740234,"lng":lngDiff+121.52069091796875},
+//        {"lat":latDiff+31.14567756652832,"lng":lngDiff+121.52093505859375},
+//        {"lat":latDiff+31.145465850830078,"lng":lngDiff+121.52104187011719},{"lat":latDiff+31.144882202148438,"lng":lngDiff+121.52043151855469},{"lat":latDiff+31.14481544494629,"lng":lngDiff+121.52009582519531},{"lat":latDiff+31.144760131835938,"lng":lngDiff+121.51985168457031},{"lat":latDiff+31.145002365112305,"lng":lngDiff+121.51907348632812},{"lat":latDiff+31.14520263671875,"lng":lngDiff+121.51892852783203},{"lat":latDiff+31.145736694335938,"lng":lngDiff+121.51868438720703},{"lat":latDiff+31.14602279663086,"lng":lngDiff+121.5188980102539},{"lat":latDiff+31.14630699157715,"lng":lngDiff+121.51895141601562},{"lat":latDiff+31.146610260009766,"lng":lngDiff+121.51885223388672},{"lat":latDiff+31.14689826965332,"lng":lngDiff+121.51860809326172},{"lat":latDiff+31.146984100341797,"lng":lngDiff+121.51832580566406},{"lat":latDiff+31.14677619934082,"lng":lngDiff+121.51838684082031}]
+      // 生成坐标点
+      var trackPoint = [];
+      for (var i = 0, j = pointArr.length; i < j; i++) {
+        trackPoint.push(new BMap.Point(pointArr[i].lng, pointArr[i].lat));
+      }
+
+      map.centerAndZoom(trackPoint[0], 15);
+
+      // 画线
+      var polyline = new BMap.Polyline(trackPoint, {
+        strokeColor: "#1869AD",
+        strokeWeight: 3,
+        strokeOpacity: 1
+      });
+      map.addOverlay(polyline);
+
+      // 配置图片
+      var size = new BMap.Size(26, 26);
+      var offset = new BMap.Size(0, -13);
+      var imageSize = new BMap.Size(26, 26);
+      var icon = new BMap.Icon('http://qyadmin.weichongming.com/logo.png', size, {
+        imageSize: imageSize
+      });
+
+      // 画图标
+      for (var i = 0, j = trackPoint.length; i < j; i++) {
+        var marker = new BMap.Marker(trackPoint[i], {
+          icon: icon,
+          offset: offset
+        }); // 创建标注
+        map.addOverlay(marker);
 
       }
-      function drawLine(results){
-        var opacity = 0.45;
-        var planObj = results.getPlan(0);
-        var b = new Array();
-        var addMarkerFun = function(point,imgType,index,title){
-          var url;
-          var width;
-          var height
-          var myIcon;
-          // imgType:1的场合，为起点和终点的图；2的场合为车的图形
-          if(imgType == 1){
-            url = "http://lbsyun.baidu.com/jsdemo/img/dest_markers.png";
-            width = 42;
-            height = 34;
-            myIcon = new BMap.Icon(url,new BMap.Size(width, height),{offset: new BMap.Size(14, 32),imageOffset: new BMap.Size(0, 0 - index * height)});
-          }else{
-            url = "http://lbsyun.baidu.com/jsdemo/img/trans_icons.png";
-            width = 22;
-            height = 25;
-            var d = 25;
-            var cha = 0;
-            var jia = 0
-            if(index == 2){
-              d = 21;
-              cha = 5;
-              jia = 1;
-            }
-            myIcon = new BMap.Icon(url,new BMap.Size(width, d),{offset: new BMap.Size(10, (11 + jia)),imageOffset: new BMap.Size(0, 0 - index * height - cha)});
-          }
 
-          var marker = new BMap.Marker(point, {icon: myIcon});
-          if(title != null && title != ""){
-            marker.setTitle(title);
-          }
-          // 起点和终点放在最上面
-          if(imgType == 1){
-            marker.setTop(true);
-          }
-          map.addOverlay(marker);
-        }
-        var addPoints = function(points){
-          for(var i = 0; i < points.length; i++){
-            bounds.push(points[i]);
-            b.push(points[i]);
+      //根据经纬极值计算绽放级别。 (从网上复制)
+      function getZoom(maxLng, minLng, maxLat, minLat) {
+        var zoom = ["50", "100", "200", "500", "1000", "2000", "5000", "10000", "20000", "25000", "50000", "100000", "200000", "500000", "1000000", "2000000"]; // 级别18到3。
+        var pointA = new BMap.Point(maxLng, maxLat); // 创建点坐标A
+        var pointB = new BMap.Point(minLng, minLat); // 创建点坐标B
+        var distance = map.getDistance(pointA, pointB).toFixed(1); //获取两点距离,保留小数点后两位
+        for (var i = 0, zoomLen = zoom.length; i < zoomLen; i++) {
+          if (zoom[i] - distance > 0) {
+            return 18 - i + 3; //之所以会多3，是因为地图范围常常是比例尺距离的10倍以上。所以级别会增加3。
           }
         }
-        // 绘制驾车步行线路
-        for (var i = 0; i < planObj.getNumRoutes(); i ++){
-          var route = planObj.getRoute(i);
-          if (route.getDistance(false) <= 0){continue;}
-          addPoints(route.getPath());
-          // 驾车线路
-          if(route.getRouteType() == BMAP_ROUTE_TYPE_DRIVING){
-            map.addOverlay(new BMap.Polyline(route.getPath(), {strokeColor: "#0030ff",strokeOpacity:opacity,strokeWeight:6,enableMassClear:true}));
-          }else{
-            // 步行线路有可能为0
-            map.addOverlay(new BMap.Polyline(route.getPath(), {strokeColor: "#30a208",strokeOpacity:0.75,strokeWeight:4,enableMassClear:true}));
-          }
-        }
-        map.setViewport(bounds);
-        // 终点
-        addMarkerFun(results.getEnd().point,1,1);
-        // 开始点
-        addMarkerFun(results.getStart().point,1,0);
-        linesPoints[linesPoints.length] = b;
       }
-      initLine();
-      setTimeout(function(){
-        run();
-      },1500);
+
+      //  (从网上复制)
+      function setZoom(points) {
+        if (points.length > 0) {
+          var maxLng = points[0].lng;
+          var minLng = points[0].lng;
+          var maxLat = points[0].lat;
+          var minLat = points[0].lat;
+          var res;
+          for (var i = points.length - 1; i >= 0; i--) {
+            res = points[i];
+            if (res.lng > maxLng) maxLng = res.lng;
+            if (res.lng < minLng) minLng = res.lng;
+            if (res.lat > maxLat) maxLat = res.lat;
+            if (res.lat < minLat) minLat = res.lat;
+          }
+          var cenLng = (parseFloat(maxLng) + parseFloat(minLng)) / 2;
+          var cenLat = (parseFloat(maxLat) + parseFloat(minLat)) / 2;
+          var zoom = getZoom(maxLng, minLng, maxLat, minLat);
+          map.centerAndZoom(new BMap.Point(cenLng, cenLat), zoom);
+        } else {
+          //没有坐标，显示全中国
+          map.centerAndZoom(new BMap.Point(103.388611, 35.563611), 5);
+        }
+      }
+
+      setZoom(pointArr)
     }
   }
 }

@@ -108,8 +108,14 @@ export const constantRouterMap = [
     path: '/map',
     component: Layout,
     redirect: '/map/index',
-    children: [{ path: 'index', component: () => import('@/views/map/index'), name: 'map', meta: { title: '地图' }}]
+    children: [{ path: 'index', component: () => import('@/views/map/index'), name: 'map', meta: { title: '轨迹' }}]
   }
+  // {
+  //   path: '/map2',
+  //   component: Layout,
+  //   redirect: '/map2/index',
+  //   children: [{ path: 'index', component: () => import('@/views/map/index2'), name: 'map2', meta: { title: '地图' }}]
+  // }
   // {
   //   path: '/documentation',
   //   component: Layout,

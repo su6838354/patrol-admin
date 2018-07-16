@@ -74,8 +74,7 @@ export default {
   },
   created() {
     const manager = io.Manager(
-      'http://139.196.243.147:3333',
-//      'http://127.0.0.1:3333',
+      'http://139.196.243.147:3333', // 'http://127.0.0.1:3333',
       {
         query: { username: 'admin' },
         reconnectionAttempts: 100,
@@ -167,7 +166,7 @@ export default {
       this.socket.emit('send message from admin', {
         username: this.current,
         msg: msg,
-        from: 'admin',
+        from: 'admin'
       })
       this.users[this.current].msgs.push({ from: 'admin', msg: this.msg })
       this.msg = ''

@@ -87,3 +87,11 @@ export function updateFeedBack(data) {
     data: data
   })
 }
+
+export function getPoints(data) {
+  return request({
+    url: 'http://security.weichongming.com/patrol/get_points',
+    method: 'post',
+    data: data
+  })
+}
