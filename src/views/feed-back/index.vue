@@ -38,7 +38,18 @@
 
       <el-table-column label="图片"  align="center">
         <template slot-scope="scope">
-          <img width= '90' height='60' :src="scope.row.image_url"/>
+          <img v-if="scope.row.image_url" width= '90' height='auto' @click="openImg(scope.row.image_url)" :src="scope.row.image_url"/>
+          <span v-else>无图片</span>
+          <el-dialog
+            :visible.sync="bigImg"
+            width="30%"
+            :show-close=false
+          >
+            <div  style="width:100%;height:0;">
+              <img id="bigImgBox" style="width:100%;height:auto;" :src="bigImgUrl"/>
+            </div>
+          </el-dialog>
+
         </template>
       </el-table-column>
 
@@ -95,6 +106,8 @@
     name: 'exportExcel',
     data() {
       return {
+        bigImg: false,
+        bigImgUrl: '',
         id: '',
         type: '',
         currentPage: 1,
@@ -116,6 +129,10 @@
       this.fetchData()
     },
     methods: {
+      openImg(data) {
+        this.bigImg = true
+        this.bigImgUrl = data
+      },
       getStatus() {
         this.fetchData()
       },
@@ -253,6 +270,10 @@
       .el-form-item__content {
         width:60%;
       }
+    }
+    .el-dialog__body, .el-dialog__header {
+      padding:0;
+      margin:0;
     }
   }
 
