@@ -24,6 +24,11 @@
           {{scope.row.name}}
         </template>
       </el-table-column>
+      <el-table-column  label="手机号" width="115" align="center">
+        <template slot-scope="scope">
+          {{scope.row.mobile}}
+        </template>
+      </el-table-column>
       <el-table-column v-if="this.type!== 'people'" label="性别" width="115" align="center">
         <template slot-scope="scope">
           {{scope.row.sex === 1 ? '男' : '女'}}
