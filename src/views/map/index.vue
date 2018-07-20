@@ -187,6 +187,7 @@ export default {
       if (!this.xunluoId) {
         return
       }
+      this.$message.info('查询中...', 10000)
       const start = moment(this.value1 || (new Date())).format('YYYY-MM-DD 00:00:00')
       const end =  moment(this.value1 || (new Date())).format('YYYY-MM-DD 23:59:59')
       const p = this.xunluoList.filter(item => item.id == this.xunluoId)[0]
@@ -196,6 +197,7 @@ export default {
         "begin_time": start,
         "end_time": end, //"2018-07-15 23:59:59"
       }).then((rep) => {
+        this.$message.success('查询成功', 1)
         this.draw(rep.data.topics)
       })
     },
