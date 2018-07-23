@@ -72,23 +72,23 @@ export default {
             picker.$emit('pick', [start, end]);
           }
         },
-//        {
-//          text: '最近一个月',
-//          onClick(picker) {
-//            const end = new Date();
-//            const start = new Date();
-//            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-//            picker.$emit('pick', [start, end]);
-//          }
-//        }, {
-//          text: '最近三个月',
-//          onClick(picker) {
-//            const end = new Date();
-//            const start = new Date();
-//            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-//            picker.$emit('pick', [start, end]);
-//          }
-//        }
+  //        {
+  //          text: '最近一个月',
+  //          onClick(picker) {
+  //            const end = new Date();
+  //            const start = new Date();
+  //            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+  //            picker.$emit('pick', [start, end]);
+  //          }
+  //        }, {
+  //          text: '最近三个月',
+  //          onClick(picker) {
+  //            const end = new Date();
+  //            const start = new Date();
+  //            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+  //            picker.$emit('pick', [start, end]);
+  //          }
+  //        }
         ]
       },
       value5: [start, end]
@@ -107,13 +107,13 @@ export default {
     fetchHelper(data).then(response => {
       if (response.data.code === 0) {
         this.xunluoList = response.data.data
-//        this.getRealTimePoints();
+  //        this.getRealTimePoints();
       }
     });
   },
   mounted () {
-    this.getPoints();
-    this.draw()
+    this.getPoints()
+    this.draw([])
   },
   computed: {
     msgs() {
@@ -215,27 +215,32 @@ export default {
       pointArr = pointArr.map(item => {
         return {
           lat: latDiff + item.lat,
-          lng: lngDiff + item.lng
+          lng: lngDiff + item.lng,
+          gpst: item.gpst
         }
       })
 
-//      var pointArr = [
-//        {"lat":latDiff+31.146997451782227,"lng":lngDiff+121.51802062988281},
-//        {"lat":latDiff+31.146934509277344,"lng":lngDiff+121.51838684082031},
-//        {"lat":latDiff+31.146934509277344,"lng":lngDiff+121.51838684082031},
-//        {"lat":latDiff+31.146930694580078,"lng":lngDiff+121.5184555053711},
-//        {"lat":latDiff+31.146732330322266,"lng":lngDiff+121.51885986328125},
-//        {"lat":latDiff+31.14692497253418,"lng":lngDiff+121.51954650878906},
-//        {"lat":latDiff+31.146995544433594,"lng":lngDiff+121.51984405517578},
-//        {"lat":latDiff+31.146968841552734,"lng":lngDiff+121.51988983154297},
-//        {"lat":latDiff+31.146114349365234,"lng":lngDiff+121.5206069946289},
-//        {"lat":latDiff+31.145870208740234,"lng":lngDiff+121.52069091796875},
-//        {"lat":latDiff+31.14567756652832,"lng":lngDiff+121.52093505859375},
-//        {"lat":latDiff+31.145465850830078,"lng":lngDiff+121.52104187011719},{"lat":latDiff+31.144882202148438,"lng":lngDiff+121.52043151855469},{"lat":latDiff+31.14481544494629,"lng":lngDiff+121.52009582519531},{"lat":latDiff+31.144760131835938,"lng":lngDiff+121.51985168457031},{"lat":latDiff+31.145002365112305,"lng":lngDiff+121.51907348632812},{"lat":latDiff+31.14520263671875,"lng":lngDiff+121.51892852783203},{"lat":latDiff+31.145736694335938,"lng":lngDiff+121.51868438720703},{"lat":latDiff+31.14602279663086,"lng":lngDiff+121.5188980102539},{"lat":latDiff+31.14630699157715,"lng":lngDiff+121.51895141601562},{"lat":latDiff+31.146610260009766,"lng":lngDiff+121.51885223388672},{"lat":latDiff+31.14689826965332,"lng":lngDiff+121.51860809326172},{"lat":latDiff+31.146984100341797,"lng":lngDiff+121.51832580566406},{"lat":latDiff+31.14677619934082,"lng":lngDiff+121.51838684082031}]
+  //      var pointArr = [
+  //        {"lat":latDiff+31.146997451782227,"lng":lngDiff+121.51802062988281},
+  //        {"lat":latDiff+31.146934509277344,"lng":lngDiff+121.51838684082031},
+  //        {"lat":latDiff+31.146934509277344,"lng":lngDiff+121.51838684082031},
+  //        {"lat":latDiff+31.146930694580078,"lng":lngDiff+121.5184555053711},
+  //        {"lat":latDiff+31.146732330322266,"lng":lngDiff+121.51885986328125},
+  //        {"lat":latDiff+31.14692497253418,"lng":lngDiff+121.51954650878906},
+  //        {"lat":latDiff+31.146995544433594,"lng":lngDiff+121.51984405517578},
+  //        {"lat":latDiff+31.146968841552734,"lng":lngDiff+121.51988983154297},
+  //        {"lat":latDiff+31.146114349365234,"lng":lngDiff+121.5206069946289},
+  //        {"lat":latDiff+31.145870208740234,"lng":lngDiff+121.52069091796875},
+  //        {"lat":latDiff+31.14567756652832,"lng":lngDiff+121.52093505859375},
+  //        {"lat":latDiff+31.145465850830078,"lng":lngDiff+121.52104187011719},{"lat":latDiff+31.144882202148438,"lng":lngDiff+121.52043151855469},{"lat":latDiff+31.14481544494629,"lng":lngDiff+121.52009582519531},{"lat":latDiff+31.144760131835938,"lng":lngDiff+121.51985168457031},{"lat":latDiff+31.145002365112305,"lng":lngDiff+121.51907348632812},{"lat":latDiff+31.14520263671875,"lng":lngDiff+121.51892852783203},{"lat":latDiff+31.145736694335938,"lng":lngDiff+121.51868438720703},{"lat":latDiff+31.14602279663086,"lng":lngDiff+121.5188980102539},{"lat":latDiff+31.14630699157715,"lng":lngDiff+121.51895141601562},{"lat":latDiff+31.146610260009766,"lng":lngDiff+121.51885223388672},{"lat":latDiff+31.14689826965332,"lng":lngDiff+121.51860809326172},{"lat":latDiff+31.146984100341797,"lng":lngDiff+121.51832580566406},{"lat":latDiff+31.14677619934082,"lng":lngDiff+121.51838684082031}]
       // 生成坐标点
+      var end = 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1532265533917&di=63a6930acb915aa393f360c70dcd05d5&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimage%2Fc0%253Dshijue1%252C0%252C0%252C294%252C40%2Fsign%3D6f2f660230292df583cea456d4583615%2Fe1fe9925bc315c60cf69c8c287b1cb134954771b.jpg'
+      var start = 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1532265653248&di=5e9096fa989846049838fecbf0fd73a2&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2F77094b36acaf2eddd79b84d3861001e9390193a6.jpg'
       var trackPoint = [];
       for (var i = 0, j = pointArr.length; i < j; i++) {
-        trackPoint.push(new BMap.Point(pointArr[i].lng, pointArr[i].lat));
+        const p = new BMap.Point(pointArr[i].lng, pointArr[i].lat)
+        p.gpst = pointArr[i].gpst;
+        trackPoint.push(p);
       }
 
       map.centerAndZoom(trackPoint[0], 15);
@@ -249,22 +254,51 @@ export default {
       map.addOverlay(polyline);
 
       // 配置图片
-      var size = new BMap.Size(13, 13);
-      var offset = new BMap.Size(0, -7);
-      var imageSize = new BMap.Size(13, 13);
+      var size = new BMap.Size(20, 20);
+      var offset = new BMap.Size(0, -10);
+      var imageSize = new BMap.Size(20, 20);
       var icon = new BMap.Icon('http://ypy.weichongming.com/sample-upload-1531761060838.jpg', size, {
         imageSize: imageSize
       });
 
       // 画图标
       for (var i = 0, j = trackPoint.length; i < j; i++) {
-        var marker = new BMap.Marker(trackPoint[i], {
-          icon: icon,
-          offset: offset
-        }); // 创建标注
-        map.addOverlay(marker);
+//        var marker = new BMap.Marker(trackPoint[i], {
+////          icon: icon,
+////          offset: offset
+//        }); // 创建标注
+        if (i === 0) {
+          const marker = new BMap.Marker(trackPoint[i], {
+            icon: getIcon(start),
+            offset: offset
+          }); // 创建标注
+          map.addOverlay(marker);
+          const infoWindow = new BMap.InfoWindow(`${trackPoint[i].gpst}[起点]`);
+          marker.addEventListener("click", function(){
+            this.openInfoWindow(infoWindow);
+          });
+        }
+        if (i+1 === j) {
+          const marker = new BMap.Marker(trackPoint[i], {
+            icon: getIcon(end),
+            offset: offset
+          }); // 创建标注
+          map.addOverlay(marker);
+
+          const infoWindow = new BMap.InfoWindow(`${trackPoint[i].gpst}[终点]`);
+          marker.addEventListener("click", function(){
+            this.openInfoWindow(infoWindow);
+          });
+        }
 
 
+
+      }
+
+      function getIcon(imgUrl){
+        return new BMap.Icon(imgUrl, size, {
+          imageSize: imageSize
+        })
       }
 
       //根据经纬极值计算绽放级别。 (从网上复制)
