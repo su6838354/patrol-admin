@@ -330,7 +330,7 @@
         if (param === 'update') {
           this.form.status = row.status
           this.form.name = row.name
-          this.form.sex = row.sex.toString()
+          this.form.sex = (row.sex || 0).toString()
           this.form.age = row.age
           this.form.watch = row.watch
           this.form.area = row.area
@@ -346,7 +346,7 @@
         if (param === 'add') {
           this.form.status = 'online'
           this.form.name = ''
-          this.form.sex = ''
+          this.form.sex = 1
           this.form.age = ''
           this.form.watch = ''
           this.form.area = ''
@@ -446,7 +446,7 @@
         }
         fetchAddPeople(data).then(({ data: response }) => {
           if (response.code === 0) {
-            data.id = response.data.insertId - 1
+            data.id = response.data.insertId
             this.list.unshift(data)
             this.listLoading = false
             this.dialogFormVisible = false

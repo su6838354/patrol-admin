@@ -126,8 +126,8 @@
         request.post('http://121.40.98.157:89/gpsonline/GPSAPI', {form: {
           version: 1,
           method: 'loadVehicles',
-          uid: '2437166',
-          uKey: 'ba56097d0986fb6739d9254482498493'
+          uid: '2438426',
+          uKey: '978d498c97feae4f95d66fee27bef26c'
         }}, (err, rep) => {
           this.vehicles = JSON.parse(rep.body).groups[0].vehicles;
         });
