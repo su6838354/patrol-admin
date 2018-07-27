@@ -24,7 +24,7 @@
 </template>
 
 <script>
-  import { getPoints } from '../../api/article'
+  import { getPoints, getRealPoints } from '../../api/article'
   import moment from 'moment'
   import { fetchHelper } from '../../api/article'
   import request from 'request'
@@ -108,12 +108,13 @@
         if (response.data.code === 0) {
           this.xunluoList = response.data.data
           this.getRealTimePoints();
+//          this.getRealPoints();
         }
       });
     },
     mounted () {
-      this.getPoints();
-      this.draw()
+      this.getPoints()
+      this.draw([])
     },
     computed: {
       msgs() {
@@ -125,17 +126,24 @@
         request.post('http://121.40.98.157:89/gpsonline/GPSAPI', {form: {
           version: 1,
           method: 'loadVehicles',
-          uid: '2435577',
-          uKey: '41a21112614ad3f3f748a5e43c272d5f'
+          uid: '2437166',
+          uKey: 'ba56097d0986fb6739d9254482498493'
         }}, (err, rep) => {
           this.vehicles = JSON.parse(rep.body).groups[0].vehicles;
         });
         setInterval(() => {
           this._getRealTimePoints()
-        }, 4000);
+        }, 500 * 10);
       },
+
+      getRealPoints() {
+        getRealPoints().then(rep => {
+          console.log(rep);
+        })
+      },
+
       _getRealTimePoints(vKey) {
-        this.xunluoList.map(item => {
+        this.xunluoList.map((item, index) => {
           const v = this.vehicles.filter(item2 => item2.name == item.area)[0]
           if (v) {
             request.post('http://121.40.98.157:89/gpsonline/GPSAPI', {form: {
@@ -146,26 +154,37 @@
             }}, (err, rep) => {
               const body = JSON.parse(rep.body);
               if (body.success) {
-                const lngDiff = 0.010988
-                const latDiff = 0.003575
+//                const lngDiff = 0.010988
+//                const latDiff = 0.003575
+                const lngDiff = 0.011298
+                const latDiff = 0.003895
                 const point = {
                   lat: body.locs[0].lat + latDiff,
                   lng: body.locs[0].lng + lngDiff
                 }
                 // 配置图片
-                var size = new BMap.Size(30, 30);
-                var offset = new BMap.Size(0, -15);
-                var imageSize = new BMap.Size(30, 30);
-                var icon = new BMap.Icon('http://ypy.weichongming.com/sample-upload-1531761060838.jpg', size, {
+                const size = new BMap.Size(30, 30);
+                const offset = new BMap.Size(0, -15);
+                const imageSize = new BMap.Size(30, 30);
+                const icon = new BMap.Icon('http://ypy.weichongming.com/sample-upload-1531761060838.jpg', size, {
                   imageSize: imageSize
                 });
                 const Bp = new BMap.Point(point.lng, point.lat)
-                var marker = new BMap.Marker(Bp, {
+                const marker = new BMap.Marker(Bp, {
                   icon: icon,
                   offset: offset
                 }); // 创建标注
+                const label = new BMap.Label("我是"+item.name,{offset:new BMap.Size(10, -10)});
+                const _index = index;
+                marker.setLabel(label);
+                marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
                 this.map.addOverlay(marker);
-                var infoWindow = new BMap.InfoWindow(`${item.name}`);
+
+                setTimeout(() => {
+                  marker.setTop(true)
+                }, _index * 500);
+
+                const infoWindow = new BMap.InfoWindow(`${item.name}:${body.locs[0].info}`);
                 marker.addEventListener("click", function(){
                   this.openInfoWindow(infoWindow);
                 });

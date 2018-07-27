@@ -96,3 +96,12 @@ export function getPoints(data) {
     data: data
   })
 }
+
+export function getRealPoints(data) {
+  return request({
+    url: 'http://127.0.0.1:7001/patrol/get_real_points',
+    // url: 'http://security.weichongming.com/patrol/get_points',
+    method: 'post',
+    data: data
+  })
+}

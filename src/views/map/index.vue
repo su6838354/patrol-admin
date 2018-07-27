@@ -210,8 +210,10 @@ export default {
       map.enableScrollWheelZoom(); // 开启鼠标滚轮缩放
       map.addControl(new BMap.ScaleControl()); // 添加比例尺控件
 
-      const lngDiff = 0.010988
-      const latDiff = 0.003575
+//      const lngDiff = 0.010988
+//      const latDiff = 0.003575
+      const lngDiff = 0.011298
+      const latDiff = 0.003895
       pointArr = pointArr.map(item => {
         return {
           lat: latDiff + item.lat,

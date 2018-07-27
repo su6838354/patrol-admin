@@ -50,7 +50,7 @@ export const constantRouterMap = [
       path: 'type=help',
       component: () => import('@/views/helper/index'),
       name: 'help',
-      meta: { title: '帮教人员', icon: 'documentation', noCache: true }
+      meta: { title: '帮教小组成员', icon: 'documentation', noCache: true }
     },
     {
       path: 'type=mediation',
@@ -62,7 +62,7 @@ export const constantRouterMap = [
       path: 'type=guard',
       component: () => import('@/views/helper/index'),
       name: 'guard',
-      meta: { title: '负责人', icon: 'documentation', noCache: true }
+      meta: { title: '重点守护部位人员', icon: 'documentation', noCache: true }
     },
     {
       path: 'type=police',
@@ -88,13 +88,13 @@ export const constantRouterMap = [
       path: 'type=people',
       component: () => import('@/views/feed-back/index'),
       name: 'people',
-      meta: { title: '民情反馈', icon: 'documentation', noCache: true }
+      meta: { title: '警情报送', icon: 'documentation', noCache: true }
     },
     {
       path: 'type=govern',
       component: () => import('@/views/feed-back/index'),
       name: 'govern',
-      meta: { title: '政务反馈', icon: 'documentation', noCache: true }
+      meta: { title: '工作情况反馈', icon: 'documentation', noCache: true }
     },
     {
       path: 'type=yuyue',

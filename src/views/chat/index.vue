@@ -71,6 +71,10 @@ export default {
         this.sendMsg()
       }
     })
+    this.ReceiveAudio = new Audio()
+    this.ReceiveAudio.src = 'http://ypy.weichongming.com/sample-upload-8855.mp3'
+    this.SendAudio = new Audio()
+    this.SendAudio.src = 'http://ypy.weichongming.com/sample-upload-7820.mp3'
   },
   created() {
     const manager = io.Manager(
@@ -90,6 +94,7 @@ export default {
     this.socket.emit('admin connect')
     this.socket.on('send message from user to admin', (data) => {
       const username = data.username
+      this.ReceiveAudio.play()
       if (!this.users[username]) {
         this.users[username] = {
           online: true,
@@ -168,6 +173,7 @@ export default {
         msg: msg,
         from: 'admin'
       })
+      this.SendAudio.play();
       this.users[this.current].msgs.push({ from: 'admin', msg: this.msg })
       this.msg = ''
     },
