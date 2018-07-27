@@ -177,8 +177,8 @@
                 const label = new BMap.Label("我是"+item.name,{offset:new BMap.Size(10, -10)});
                 const _index = index;
                 marker.setLabel(label);
-                marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
                 this.map.addOverlay(marker);
+//                marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
 
                 setTimeout(() => {
                   marker.setTop(true)
