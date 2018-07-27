@@ -43,7 +43,7 @@
 
       <el-table-column label="图片"  align="center">
         <template slot-scope="scope">
-          <img v-if="scope.row.image_url" width= '90' height='auto' @click="openImg(scope.row.image_url)" :src="scope.row.image_url"/>
+          <img v-if="scope.row.image_url" width= '90' height='auto' @click="openImg(scope.row.image_url)" :src="scope.row.image_url + '!/fw/400'"/>
           <span v-else>无图片</span>
           <el-dialog
             :visible.sync="bigImg"

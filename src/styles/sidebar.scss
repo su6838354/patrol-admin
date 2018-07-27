@@ -8,7 +8,7 @@
   // 侧边栏
   .sidebar-container {
     transition: width 0.28s;
-    width: 180px !important;
+    width: 200px !important;
     height: 100%;
     position: fixed;
     font-size: 0px;
@@ -100,7 +100,7 @@
     }
     .sidebar-container {
       transition: transform .28s;
-      width: 180px !important;
+      width: 200px !important;
     }
     &.hideSidebar {
       .sidebar-container {
