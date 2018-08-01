@@ -37,6 +37,9 @@
       const start = new Date();
       start.setTime(start.getTime() - 3600 * 1000 * 24 * 1);
       return {
+        markerMap: {
+
+        },
         value1: start,
         vehicles: [],
         xunluoList: [],
@@ -71,24 +74,7 @@
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 1);
               picker.$emit('pick', [start, end]);
             }
-          },
-//        {
-//          text: '最近一个月',
-//          onClick(picker) {
-//            const end = new Date();
-//            const start = new Date();
-//            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-//            picker.$emit('pick', [start, end]);
-//          }
-//        }, {
-//          text: '最近三个月',
-//          onClick(picker) {
-//            const end = new Date();
-//            const start = new Date();
-//            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-//            picker.$emit('pick', [start, end]);
-//          }
-//        }
+          }
           ]
         },
         value5: [start, end]
@@ -169,25 +155,32 @@
                 const icon = new BMap.Icon('http://ypy.weichongming.com/sample-upload-1531761060838.jpg', size, {
                   imageSize: imageSize
                 });
-                const Bp = new BMap.Point(point.lng, point.lat)
-                const marker = new BMap.Marker(Bp, {
-                  icon: icon,
-                  offset: offset
-                }); // 创建标注
-                const label = new BMap.Label("我是"+item.name,{offset:new BMap.Size(10, -10)});
-                const _index = index;
-                marker.setLabel(label);
-                this.map.addOverlay(marker);
+                const Bp = new BMap.Point(point.lng, point.lat);
+                let marker = this.markerMap[item.name]
+                if (this.markerMap[item.name]) {
+                  marker = this.markerMap[item.name];
+                  marker.setPosition(Bp)
+                  marker.setTop(false)
+                } else {
+                  this.markerMap[item.name] = new BMap.Marker(Bp, {
+                    icon: icon,
+                    offset: offset
+                  }); // 创建标注
+                  marker = this.markerMap[item.name]
+                  const label = new BMap.Label(item.name,{offset:new BMap.Size(10, -10)});
+                  marker.setLabel(label);
+                  this.map.addOverlay(marker);
 //                marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+                  const infoWindow = new BMap.InfoWindow(`${item.name}:${body.locs[0].info}`);
+                  marker.addEventListener("click", function(){
+                    this.openInfoWindow(infoWindow);
+                  })
+                }
 
+                const _index = index;
                 setTimeout(() => {
                   marker.setTop(true)
                 }, _index * 500);
-
-                const infoWindow = new BMap.InfoWindow(`${item.name}:${body.locs[0].info}`);
-                marker.addEventListener("click", function(){
-                  this.openInfoWindow(infoWindow);
-                });
 
                 if (!this.first) {
                   this.first = true
@@ -234,20 +227,6 @@
             lng: lngDiff + item.lng
           }
         })
-
-//      var pointArr = [
-//        {"lat":latDiff+31.146997451782227,"lng":lngDiff+121.51802062988281},
-//        {"lat":latDiff+31.146934509277344,"lng":lngDiff+121.51838684082031},
-//        {"lat":latDiff+31.146934509277344,"lng":lngDiff+121.51838684082031},
-//        {"lat":latDiff+31.146930694580078,"lng":lngDiff+121.5184555053711},
-//        {"lat":latDiff+31.146732330322266,"lng":lngDiff+121.51885986328125},
-//        {"lat":latDiff+31.14692497253418,"lng":lngDiff+121.51954650878906},
-//        {"lat":latDiff+31.146995544433594,"lng":lngDiff+121.51984405517578},
-//        {"lat":latDiff+31.146968841552734,"lng":lngDiff+121.51988983154297},
-//        {"lat":latDiff+31.146114349365234,"lng":lngDiff+121.5206069946289},
-//        {"lat":latDiff+31.145870208740234,"lng":lngDiff+121.52069091796875},
-//        {"lat":latDiff+31.14567756652832,"lng":lngDiff+121.52093505859375},
-//        {"lat":latDiff+31.145465850830078,"lng":lngDiff+121.52104187011719},{"lat":latDiff+31.144882202148438,"lng":lngDiff+121.52043151855469},{"lat":latDiff+31.14481544494629,"lng":lngDiff+121.52009582519531},{"lat":latDiff+31.144760131835938,"lng":lngDiff+121.51985168457031},{"lat":latDiff+31.145002365112305,"lng":lngDiff+121.51907348632812},{"lat":latDiff+31.14520263671875,"lng":lngDiff+121.51892852783203},{"lat":latDiff+31.145736694335938,"lng":lngDiff+121.51868438720703},{"lat":latDiff+31.14602279663086,"lng":lngDiff+121.5188980102539},{"lat":latDiff+31.14630699157715,"lng":lngDiff+121.51895141601562},{"lat":latDiff+31.146610260009766,"lng":lngDiff+121.51885223388672},{"lat":latDiff+31.14689826965332,"lng":lngDiff+121.51860809326172},{"lat":latDiff+31.146984100341797,"lng":lngDiff+121.51832580566406},{"lat":latDiff+31.14677619934082,"lng":lngDiff+121.51838684082031}]
         // 生成坐标点
         var trackPoint = [];
         for (var i = 0, j = pointArr.length; i < j; i++) {
