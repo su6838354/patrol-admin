@@ -69,6 +69,13 @@
         </template>
       </el-table-column>
 
+      <el-table-column label="村落" v-if="this.role === 'help' || this.role === 'mediation'" align="center">
+        <template slot-scope="scope">
+          {{scope.row.village}}
+        </template>
+      </el-table-column>
+
+
 
       <el-table-column  v-if ="this.role === 'mediation'" label="案件处理" align="center">
         <template slot-scope="scope">
@@ -150,6 +157,18 @@
         </el-form-item>
         <el-form-item label="管辖区域" v-if="this.role !== 'guard' && this.role !== 'xunluo'" :label-width="formLabelWidth">
           <el-input v-model="form.area" auto-complete="off"></el-input>
+        </el-form-item>
+
+        <el-form-item label="村落" v-if="this.role === 'help' || this.role === 'mediation'" :label-width="formLabelWidth">
+          <!--<el-input v-model="form.village" auto-complete="off"></el-input>-->
+          <el-select v-model="form.village" clearable placeholder="请选择">
+            <el-option
+              v-for="item in villageOptions"
+              :key="item"
+              :label="item"
+              :value="item">
+            </el-option>
+          </el-select>
         </el-form-item>
 
         <el-form-item label="对讲机编号" v-if="this.role === 'xunluo'" :label-width="formLabelWidth">
@@ -238,6 +257,9 @@
     name: 'exportExcel',
     data() {
       return {
+        villageOptions: [
+          '静南小区','团结村','富民村','排衙村','北闸村','新港村','北双村','盘西村','协西村','协兴村','协北村','双津村'
+        ],
         imageUrl: '',
         id: '',
         role: '',
@@ -262,7 +284,8 @@
           avatar: '',
           caseDetail: '',
           path: '',
-          detail: ''
+          detail: '',
+          village: ''
         },
         formLabelWidth: '30%',
         dialogFormVisible: false,
@@ -306,6 +329,7 @@
           data.age = row.age
           data.watch = row.watch
           data.area = row.area
+          data.village = row.village
           data.period = row.period
           data.good = row.good
           data.avatar = row.avatar
@@ -333,6 +357,7 @@
           this.form.sex = (row.sex || 0).toString()
           this.form.age = row.age
           this.form.watch = row.watch
+          this.form.village = row.village
           this.form.area = row.area
           this.form.period = row.period
           this.form.good = row.good
@@ -346,9 +371,10 @@
         if (param === 'add') {
           this.form.status = 'online'
           this.form.name = ''
-          this.form.sex = 1
+          this.form.sex = '1'
           this.form.age = ''
           this.form.watch = ''
+          this.form.village = ''
           this.form.area = ''
           this.form.period = ''
           this.form.good = ''
@@ -370,6 +396,7 @@
           sex: this.form.sex,
           age: this.form.age,
           watch: this.form.watch,
+          village: this.form.village,
           area: this.form.area,
           period: this.form.period,
           good: this.form.good,
@@ -435,6 +462,7 @@
           sex: parseInt(this.form.sex),
           age: this.form.age,
           watch: this.form.watch,
+          village: this.form.village,
           area: this.form.area,
           period: this.form.period,
           good: this.form.good,
