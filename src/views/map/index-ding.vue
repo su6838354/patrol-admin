@@ -109,7 +109,7 @@
     },
     methods: {
       getRealTimePoints() {
-        request.post('http://121.40.98.157:89/gpsonline/GPSAPI', {form: {
+        request.post('http://121.40.98.157:89/gpsonline/GPSAPI?version=1&method=loadVehicles&uid=2438426&uKey=978d498c97feae4f95d66fee27bef26c', {form: {
           version: 1,
           method: 'loadVehicles',
           uid: '2438426',
