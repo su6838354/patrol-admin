@@ -6,11 +6,18 @@
     <!--<el-input style='width:340px;' :placeholder="$t('excel.placeholder')" prefix-icon="el-icon-document" v-model="filename"></el-input>-->
     <!--<el-button style='margin:0 0 20px 20px;' type="primary" icon="document" @click="handleDownload" :loading="downloadLoading">{{$t('excel.export')}} excel</el-button>-->
     <div class="filter-container">
-      <el-select clearable style="width: 200px" class="filter-item" v-model="feedStatus" :placeholder="'处理状态'">
+      <el-select clearable style="width: 200px" v-model="feedStatus" :placeholder="'处理状态'">
         <el-option v-for="(item, index) in statusArray" :key="index" :label="item" :value="item">
         </el-option>
       </el-select>
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="getStatus()">{{$t('table.search')}}</el-button>
+      <el-date-picker
+        v-model="search_time"
+        type="datetimerange"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        :default-time="['12:00:00']">
+      </el-date-picker>
+      <el-button type="primary" icon="el-icon-search" @click="getStatus()">{{$t('table.search')}}</el-button>
     </div>
 
     <el-table :data="this.list" v-loading.body="listLoading" element-loading-text="拼命加载中" border fit highlight-current-row>
@@ -75,6 +82,12 @@
         </template>
       </el-table-column>
 
+      <el-table-column  label="时间"   align="center">
+        <template slot-scope="scope">
+          {{scope.row.create_time}}
+        </template>
+      </el-table-column>
+
       <el-table-column label="状态"  align="center">
         <template slot-scope="scope">
 
@@ -106,11 +119,13 @@
 <script>
   import { fetchFeedBack, updateFeedBack } from '../../api/article'
   import { parseTime } from '@/utils'
+  import moment from 'moment';
 
   export default {
     name: 'exportExcel',
     data() {
       return {
+        search_time: [moment().subtract(7, 'days'), moment()],
         bigImg: false,
         bigImgUrl: '',
         id: '',
@@ -175,6 +190,8 @@
       fetchData() {
         this.listLoading = true
         const data = {
+          start_time: moment(this.search_time[0]).valueOf()/1000,
+          end_time: moment(this.search_time[1]).valueOf()/1000,
           type: this.type,
           limit: this.pageSize,
           offset: (this.currentPage - 1) * 10
@@ -184,7 +201,12 @@
         }
         fetchFeedBack(data).then(response => {
           if (response.data.code === 0) {
-            this.list = response.data.data
+            this.list = response.data.data.map(item => {
+              return {
+                ...item,
+                create_time: moment(item.create_time * 1000).format('YYYY-MM-DD HH:mm:ss'),
+              }
+            })
             this.allPeople = response.data.data
             this.listLoading = false
             this.total = response.data.total

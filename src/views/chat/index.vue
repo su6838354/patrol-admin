@@ -19,7 +19,10 @@
 
         <div class="chat-1">
           <div class="container-1">
-            <div v-for="item in msgs" :class="['msg', item.from]"><div>{{ item.msg }}</div></div>
+            <div v-for="item in msgs" :class="['msg', item.from]">
+              <div>{{ item.msg }}</div>
+              <span class="msg-time">{{ item.time }}</span>
+            </div>
           </div>
 
           <div class='input-1'>
@@ -171,7 +174,8 @@ export default {
       this.socket.emit('send message from admin', {
         username: this.current,
         msg: msg,
-        from: 'admin'
+        from: 'admin',
+        time: (new Date()).toLocaleString() 
       })
       this.SendAudio.play();
       this.users[this.current].msgs.push({ from: 'admin', msg: this.msg, time: (new Date()).toLocaleString() })
@@ -311,6 +315,16 @@ export default {
 .chat-1 .msg.admin div {
   background-color: #565656;
   float: right;
+}
+.msg-time {
+  color: black;
+  margin-left: 1rem;
+}
+
+.msg.admin .msg-time {
+    float: right;
+    line-height: 2rem;
+    margin-right: 1rem;
 }
 
 </style>
