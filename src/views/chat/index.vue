@@ -174,7 +174,7 @@ export default {
         from: 'admin'
       })
       this.SendAudio.play();
-      this.users[this.current].msgs.push({ from: 'admin', msg: this.msg })
+      this.users[this.current].msgs.push({ from: 'admin', msg: this.msg, time: (new Date()).toLocaleString() })
       this.msg = ''
     },
     handleSizeChange(val) {
