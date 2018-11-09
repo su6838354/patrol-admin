@@ -125,7 +125,7 @@
     name: 'exportExcel',
     data() {
       return {
-        search_time: [moment().subtract(7, 'days'), moment()],
+        search_time: [moment().subtract(1, 'years'), moment()],
         bigImg: false,
         bigImgUrl: '',
         id: '',
